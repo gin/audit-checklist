@@ -14,6 +14,7 @@
 **Info**
 
 ## Smart Contract Security 101 (Checklist)
+
 1.  **Solidity versions**: Using very old versions of Solidity prevent benefits of bug fixes and newer security checks. Using the latest versions might make contracts susceptible to undiscovered compiler bugs. Consider using one of these versions: *0.5.11-0.5.13, 0.5.15-0.5.17, 0.6.8 or 0.6.10-0.6.11. *(see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity))
 
 2.  **Unlocked pragma**: Contracts should be deployed using the same compiler version/flags with which they have been tested. Locking the pragma (for e.g. by not using *^* in *pragma solidity 0.5.10)* ensures that contracts do not accidentally get deployed using an older compiler version with unfixed bugs. (see [here](https://swcregistry.io/docs/SWC-103))
@@ -22,33 +23,33 @@
 
 4.  **Incorrect access control**: Contract functions executing critical logic should have appropriate access control enforced via address checks (e.g. owner, controller etc.) typically in modifiers. Missing checks allow attackers to control critical logic. (see [here](https://docs.openzeppelin.com/contracts/3.x/api/access) and [here](https://dasp.co/#item-2))
 
-5.  **Unprotected withdraw function**: Unprotected (*external*/*public*) function calls sending Ether/tokens to user-controlled address may allow users to withdraw unauthorized funds. (see [here](https://swcregistry.io/docs/SWC-105))
+5.  **Unprotected withdraw function**: Unprotected (_external_/_public_) function calls sending Ether/tokens to user-controlled address may allow users to withdraw unauthorized funds. (see [here](https://swcregistry.io/docs/SWC-105))
 
-6.  **Unprotected call to *****selfdestruct***: A user/attacker can mistakenly/intentionally kill the contract. Protect access to such functions. (see [here](https://swcregistry.io/docs/SWC-106))
+6.  **Unprotected call to *selfdestruct***: A user/attacker can mistakenly/intentionally kill the contract. Protect access to such functions. (see [here](https://swcregistry.io/docs/SWC-106))
 
-7.  **Modifier side-effects: **Modifiers should only implement checks and not make state changes and external calls which violates the [checks-effects-interactions](https://solidity.readthedocs.io/en/develop/security-considerations.html#use-the-checks-effects-interactions-pattern) pattern. These side-effects may go unnoticed by developers/auditors because the modifier code is typically far from the function implementation. (see [here](https://consensys.net/blog/blockchain-development/solidity-best-practices-for-smart-contract-security/))
+7.  **Modifier side-effects**: Modifiers should only implement checks and not make state changes and external calls which violates the [checks-effects-interactions](https://solidity.readthedocs.io/en/develop/security-considerations.html#use-the-checks-effects-interactions-pattern) pattern. These side-effects may go unnoticed by developers/auditors because the modifier code is typically far from the function implementation. (see [here](https://consensys.net/blog/blockchain-development/solidity-best-practices-for-smart-contract-security/))
 
 8.  **Incorrect modifier**: If a modifier does not execute* _ *or *revert*, the function using that modifier will return the default value causing unexpected behavior. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-modifier))
 
-9.  **Constructor names: **Before *solc 0.4.22*, constructor names had to be the same name as the contract class containing it. Misnaming it wouldn't make it a constructor which has security implications. *Solc 0.4.22* introduced the *constructor* keyword. Until *solc 0.5.0*, contracts could have both old-style and new-style constructor names with the first defined one taking precedence over the second if both existed, which also led to security issues. *Solc 0.5.0* forced the use of *constructor* keyword. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#multiple-constructor-schemes) and [here](https://swcregistry.io/docs/SWC-118))
+9.  **Constructor names**: Before *solc 0.4.22*, constructor names had to be the same name as the contract class containing it. Misnaming it wouldn't make it a constructor which has security implications. *Solc 0.4.22* introduced the *constructor* keyword. Until *solc 0.5.0*, contracts could have both old-style and new-style constructor names with the first defined one taking precedence over the second if both existed, which also led to security issues. *Solc 0.5.0* forced the use of *constructor* keyword. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#multiple-constructor-schemes) and [here](https://swcregistry.io/docs/SWC-118))
 
-10. **Void constructor: **Calls to base contract constructors that are unimplemented leads to misplaced assumptions. Check if constructor is implemented or remove call if not. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#void-constructor))
+10. **Void constructor**: Calls to base contract constructors that are unimplemented leads to misplaced assumptions. Check if constructor is implemented or remove call if not. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#void-constructor))
 
 11. **Implicit constructor callValue check**: The creation code of a contract that does not define a constructor but has a base that does, did not revert for calls with non-zero callValue when such a constructor was not explicitly payable. This is due to a compiler bug introduced in *v0.4.5* and fixed in *v0.6.8*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
-12. **Controlled delegatecall: ***delegatecall()* or *callcode()* to an address controlled by the user allows execution of malicious contracts in the context of the caller's state. Ensure trusted destination addresses for such calls. (see [here](https://swcregistry.io/docs/SWC-112))
+12. **Controlled delegatecall**: *delegatecall()* or *callcode()* to an address controlled by the user allows execution of malicious contracts in the context of the caller's state. Ensure trusted destination addresses for such calls. (see [here](https://swcregistry.io/docs/SWC-112))
 
 13. **Reentrancy vulnerabilities**: Untrusted external contract calls could callback leading to unexpected results such as multiple withdrawals or out-of-order events. Use check-effects-interactions pattern or reentrancy guards. (see [here](https://swcregistry.io/docs/SWC-107))
 
-14. **ERC777 callbacks and reentrancy: **ERC777 tokens allow arbitrary callbacks via hooks that are called during token transfers. Malicious contract addresses may cause reentrancy on such callbacks if reentrancy guards are not used. (see [here](https://quantstamp.com/blog/how-the-dforce-hacker-used-reentrancy-to-steal-25-million))
+14. **ERC777 callbacks and reentrancy**: ERC777 tokens allow arbitrary callbacks via hooks that are called during token transfers. Malicious contract addresses may cause reentrancy on such callbacks if reentrancy guards are not used. (see [here](https://quantstamp.com/blog/how-the-dforce-hacker-used-reentrancy-to-steal-25-million))
 
-15. **Avoid *****transfer()*****/*****send() *****as reentrancy mitigations**: Although *transfer()* and *send()* have been recommended as a security best-practice to prevent reentrancy attacks because they only forward 2300 gas, the gas repricing of opcodes may break deployed contracts. Use *call()* instead, without hardcoded gas limits along with checks-effects-interactions pattern or reentrancy guards for reentrancy protection. (see [here](https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/) and [here](https://swcregistry.io/docs/SWC-134))
+15. **Avoid *transfer()* / _send()_ as reentrancy mitigations**: Although *transfer()* and *send()* have been recommended as a security best-practice to prevent reentrancy attacks because they only forward 2300 gas, the gas repricing of opcodes may break deployed contracts. Use *call()* instead, without hardcoded gas limits along with checks-effects-interactions pattern or reentrancy guards for reentrancy protection. (see [here](https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/) and [here](https://swcregistry.io/docs/SWC-134))
 
 16. **Private on-chain data**: Marking variables *private* does not mean that they cannot be read on-chain. Private data should not be stored unencrypted in contract code or state but instead stored encrypted or off-chain. (see [here](https://swcregistry.io/docs/SWC-136))
 
-17. **Weak PRNG**: PRNG relying on *block.timestamp*, *now* or *blockhash *can be influenced by miners to some extent and should be avoided. (see [here](https://swcregistry.io/docs/SWC-120))
+17. **Weak PRNG**: PRNG relying on *block.timestamp*, *now* or *blockhash* can be influenced by miners to some extent and should be avoided. (see [here](https://swcregistry.io/docs/SWC-120))
 
-18. **Block values as time proxies: ***block.timestamp* and *block.number *are not good proxies for time because of issues with synchronization, miner manipulation and changing block times. (see [here](https://swcregistry.io/docs/SWC-116))
+18. **Block values as time proxies**: *block.timestamp* and *block.number* are not good proxies for time because of issues with synchronization, miner manipulation and changing block times. (see [here](https://swcregistry.io/docs/SWC-116))
 
 19. **Integer overflow/underflow**: Not using OpenZeppelin's SafeMath (or similar libraries) that check for overflows/underflows may lead to vulnerabilities or unexpected behavior if user/attacker can control the integer operands of such arithmetic operations. *Solc v0.8.0* introduced default overflow/underflow checks for all arithmetic operations. (see [here](https://swcregistry.io/docs/SWC-101) and [here](https://blog.soliditylang.org/2020/10/28/solidity-0.8.x-preview/))
 
@@ -56,39 +57,39 @@
 
 21. **Transaction order dependence: **Race conditions can be forced on specific Ethereum transactions by monitoring the mempool. For example, the classic ERC20 *approve()* change can be front-run using this method. Do not make assumptions about transaction order dependence. (see [here](https://swcregistry.io/docs/SWC-114))
 
-22. **ERC20 *****approve()***** race condition: **Use *safeIncreaseAllowance()* and *safeDecreaseAllowance()* from OpenZepppelin's *SafeERC20* implementation to prevent race conditions from manipulating the allowance amounts. (see [here](https://swcregistry.io/docs/SWC-114))
+22. **ERC20 \*\*\***approve()**\*** race condition: \**Use *safeIncreaseAllowance()* and *safeDecreaseAllowance()* from OpenZepppelin's *SafeERC20\* implementation to prevent race conditions from manipulating the allowance amounts. (see [here](https://swcregistry.io/docs/SWC-114))
 
 23. **Signature malleability**: The *ecrecover* function is susceptible to signature malleability which could lead to replay attacks. Consider using OpenZeppelin's [ECDSA library](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/cryptography/ECDSA.sol). (see [here](https://swcregistry.io/docs/SWC-117), [here](https://swcregistry.io/docs/SWC-121) and [here](https://medium.com/cryptronics/signature-replay-vulnerabilities-in-smart-contracts-3b6f7596df57))
 
 24. **ERC20 transfer() does not return boolean: **Contracts compiled with *solc > 0.4.22* interacting with such functions will revert. Use OpenZeppelin's SafeERC20 wrappers. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface) and [here](https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca))
 
-25. **Incorrect return values for ERC721 *****ownerOf()*****: **Contracts compiled with *solc > 0.4.22* interacting with ERC721 *ownerOf()* that returns a *bool* instead of *address* type will revert. Use OpenZeppelin's ERC721 contracts. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc721-interface))
+25. **Incorrect return values for ERC721 \*\*\***ownerOf()**\***: \**Contracts compiled with *solc > 0.4.22* interacting with ERC721 *ownerOf()* that returns a *bool* instead of *address\* type will revert. Use OpenZeppelin's ERC721 contracts. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc721-interface))
 
 26. **Unexpected Ether and this.balance**: A contract can receive Ether via *payable* functions, *selfdestruct(), coinbase *transaction or pre-sent before creation. Contract logic depending on *this.balanc*e can therefore be manipulated. (see [here](https://github.com/sigp/solidity-security-blog#3-unexpected-ether-1) and [here](https://swcregistry.io/docs/SWC-132))
 
-27. ***fallback***** vs *****receive()***: Check that all precautions and subtleties of *fallback*/*receive* functions related to visibility, state mutability and Ether transfers have been considered.  (see [here](https://docs.soliditylang.org/en/latest/contracts.html#fallback-function) and [here](https://docs.soliditylang.org/en/latest/contracts.html#receive-ether-function))
+27. **\*fallback\*\*\*** vs **\***receive()*\*\*: Check that all precautions and subtleties of *fallback*/*receive\* functions related to visibility, state mutability and Ether transfers have been considered.  (see [here](https://docs.soliditylang.org/en/latest/contracts.html#fallback-function) and [here](https://docs.soliditylang.org/en/latest/contracts.html#receive-ether-function))
 
 28. **Dangerous strict equalities: **Use of strict equalities with tokens/Ether can accidentally/maliciously cause unexpected behavior. Consider using *>=* or *<=* instead of *==* for such variables depending on the contract logic. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities))
 
 29. **Locked Ether**: Contracts that accept Ether via *payable* functions but without withdrawal mechanisms will lock up that Ether. Remove *payable* attribute or add withdraw function. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether))
 
-30. **Dangerous usage of *****tx.origin***: Use of *tx.origin* for authorization may be abused by a MITM malicious contract forwarding calls from the legitimate user who interacts with it. Use *msg.sender* instead. (see [here](https://swcregistry.io/docs/SWC-115))
+30. **Dangerous usage of \*\*\***tx.origin*\*\*: Use of *tx.origin* for authorization may be abused by a MITM malicious contract forwarding calls from the legitimate user who interacts with it. Use *msg.sender\* instead. (see [here](https://swcregistry.io/docs/SWC-115))
 
 31. **Contract check: **Checking if a call was made from an Externally Owned Account (EOA) or a contract account is typically done using *extcodesize* check which may be circumvented by a contract during construction when it does not have source code available. Checking if *tx.origin == msg.sender *is another option. Both have implications that need to be considered. (see [here](https://consensys.net/blog/blockchain-development/solidity-best-practices-for-smart-contract-security/))
 
-32. **Deleting a *****mapping***** within a *****struct***: Deleting a *struct* that contains a *mapping* will not delete the *mapping* contents which may lead to unintended consequences. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#deletion-on-mapping-containing-a-structure))
+32. **Deleting a \*\*\***mapping**\*** within a **\***struct*\*\*: Deleting a *struct* that contains a *mapping* will not delete the *mapping\* contents which may lead to unintended consequences. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#deletion-on-mapping-containing-a-structure))
 
 33. **Tautology or contradiction: **Tautologies (always true) or contradictions (always false) indicate potential flawed logic or redundant checks. e.g. *x >= 0* which is always true if *x* is *uint*. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction))
 
-34. **Boolean constant**: Use of Boolean constants (*true*/*false*) in code (e.g. conditionals) is indicative of flawed logic. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#misuse-of-a-boolean-constant))
+34. **Boolean constant**: Use of Boolean constants (_true_/_false_) in code (e.g. conditionals) is indicative of flawed logic. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#misuse-of-a-boolean-constant))
 
-35. **Boolean equality**: Boolean variables can be checked within conditionals directly without the use of equality operators to *true*/*false*. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality))
+35. **Boolean equality**: Boolean variables can be checked within conditionals directly without the use of equality operators to *true*/_false_. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality))
 
-36. **State-modifying functions**: Functions that modify state (in assembly or otherwise) but are labelled *constant*/*pure*/*view* revert in *solc >=0.5.0* (work in prior versions) because of the use of *STATICCALL* opcode. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#constant-functions-using-assembly-code))
+36. **State-modifying functions**: Functions that modify state (in assembly or otherwise) but are labelled *constant*/_pure_/*view* revert in *solc >=0.5.0* (work in prior versions) because of the use of *STATICCALL* opcode. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#constant-functions-using-assembly-code))
 
-37. **Return values of low-level calls**: Ensure that return values of low-level calls (*call*/*callcode*/*delegatecall*/*send*/etc.) are checked to avoid unexpected failures. (see [here](https://swcregistry.io/docs/SWC-104))
+37. **Return values of low-level calls**: Ensure that return values of low-level calls (_call_/_callcode_/_delegatecall_/_send_/etc.) are checked to avoid unexpected failures. (see [here](https://swcregistry.io/docs/SWC-104))
 
-38. **Account existence check for low-level calls**: Low-level calls *call*/*delegatecall*/*staticcall* return true even if the account called is non-existent (per EVM design). Account existence must be checked prior to calling if needed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls))
+38. **Account existence check for low-level calls**: Low-level calls *call*/_delegatecall_/*staticcall* return true even if the account called is non-existent (per EVM design). Account existence must be checked prior to calling if needed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls))
 
 39. **Dangerous shadowing: **Local variables, state variables, functions, modifiers, or events with names that shadow (i.e. override) builtin Solidity symbols e.g. *now *or other declarations from the current scope are misleading and may lead to unexpected usages and behavior. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#builtin-symbol-shadowing))
 
@@ -98,7 +99,7 @@
 
 42. **Costly operations inside a loop**: Operations such as state variable updates (use SSTOREs) inside a loop cost a lot of gas, are expensive and may lead to out-of-gas errors. Optimizations using local variables are preferred. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop))
 
-43. **Calls inside a loop: **Calls to external contracts inside a loop are dangerous (especially if the loop index can be user-controlled) because it could lead to DoS if one of the calls reverts or execution runs out of gas. Avoid calls within loops, check that loop index cannot be user-controlled or is bounded. (see [here](https://swcregistry.io/docs/SWC-113))
+43. **Calls inside a loop**: Calls to external contracts inside a loop are dangerous (especially if the loop index can be user-controlled) because it could lead to DoS if one of the calls reverts or execution runs out of gas. Avoid calls within loops, check that loop index cannot be user-controlled or is bounded. (see [here](https://swcregistry.io/docs/SWC-113))
 
 44. **DoS with block gas limit**: Programming patterns such as looping over arrays of unknown size may lead to DoS when the gas cost of execution exceeds the block gas limit. (see [here](https://swcregistry.io/docs/SWC-128))
 
@@ -116,11 +117,11 @@
 
 51. **assert() state change**: Invariants in *assert()* statements should not modify the state per best practices. *require()* should be used for such checks. (see [here](https://swcregistry.io/docs/SWC-110))
 
-52. ***require()***** vs *****assert()*****: ***require()* should be used for checking error conditions on inputs and return values while *assert()* should be used for invariant checking. Between *solc 0.4.10 *and *0.8.0*,* require()* used *REVERT* (*0xfd*) opcode which refunded remaining gas on failure while *assert()* used INVALID (*0xfe*) opcode which consumed all the supplied gas. (see [here](https://docs.soliditylang.org/en/v0.8.1/control-structures.html#error-handling-assert-require-revert-and-exceptions))
+52. ***require()* vs *assert()***: *require()* should be used for checking error conditions on inputs and return values while *assert()* should be used for invariant checking. Between *solc 0.4.10 *and *0.8.0*,* require()* used *REVERT* (_0xfd_) opcode which refunded remaining gas on failure while *assert()* used INVALID (_0xfe_) opcode which consumed all the supplied gas. (see [here](https://docs.soliditylang.org/en/v0.8.1/control-structures.html#error-handling-assert-require-revert-and-exceptions))
 
 53. **Deprecated keywords**: Use of deprecated functions/operators such as *block.blockhash()* for *blockhash()*, *msg.gas* for *gasleft(), throw* for *revert()*, *sha3()* for *keccak256()*, *callcode()* for *delegatecall(), suicide()* for *selfdestruct(), constant *for* view *or* var *for* actual type name* should be avoided to prevent unintended errors with newer compiler versions. (see [here](https://swcregistry.io/docs/SWC-111))
 
-54. **Function default visibility***: *Functions without a visibility type specifier are *public* by default in *solc < 0.5.0*. This can lead to a vulnerability where a malicious user may make unauthorized state changes. *solc >= 0.5.0* requires explicit function visibility specifiers. (see [here](https://swcregistry.io/docs/SWC-100))
+54. **Function default visibility\***: *Functions without a visibility type specifier are *public* by default in *solc < 0.5.0*. This can lead to a vulnerability where a malicious user may make unauthorized state changes. *solc >= 0.5.0\* requires explicit function visibility specifiers. (see [here](https://swcregistry.io/docs/SWC-100))
 
 55. **Incorrect inheritance order**: Contracts inheriting from multiple contracts with identical functions should specify the correct inheritance order i.e. more general to more specific to avoid inheriting the incorrect function implementation. (see [here](https://swcregistry.io/docs/SWC-125))
 
@@ -130,13 +131,13 @@
 
 58. **Modifying reference type parameters**: Structs/Arrays/Mappings passed as arguments to a function may be by value (memory) or reference (storage) as specified by the data location (optional before *solc 0.5.0*). Ensure correct usage of memory and storage in function parameters and make all data locations explicit. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#modifying-storage-array-by-value))
 
-59. **Arbitrary jump with function type variable: **Function type variables should be carefully handled and avoided in assembly manipulations to prevent jumps to arbitrary code locations. (see [here](https://swcregistry.io/docs/SWC-127))
+59. **Arbitrary jump with function type variable**: Function type variables should be carefully handled and avoided in assembly manipulations to prevent jumps to arbitrary code locations. (see [here](https://swcregistry.io/docs/SWC-127))
 
 60. **Hash collisions with multiple variable length arguments**: Using *abi.encodePacked()* with multiple variable length arguments can, in certain situations, lead to a hash collision. Do not allow users access to parameters used in *abi.encodePacked()*, use fixed length arrays or use *abi.encode()*. (see [here](https://swcregistry.io/docs/SWC-133) and [here](https://docs.soliditylang.org/en/v0.5.3/abi-spec.html#non-standard-packed-mode))
 
 61. **Malleability risk from dirty high order bits**: Types that do not occupy the full 32 bytes might contain "dirty higher order bits" which does not affect operation on types but gives different results with *msg.data*. (see [here](https://docs.soliditylang.org/en/v0.8.1/security-considerations.html#minor-details))
 
-62. **Incorrect shift in assembly**: Shift operators (*shl(x, y)*, *shr(x, y)*, *sar(x, y)*) in Solidity assembly apply the shift operation of *x* bits on *y *and not the other way around, which may be confusing. Check if the values in a shift operation are reversed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly))
+62. **Incorrect shift in assembly**: Shift operators (_shl(x, y)_, *shr(x, y)*, *sar(x, y)*) in Solidity assembly apply the shift operation of *x* bits on *y *and not the other way around, which may be confusing. Check if the values in a shift operation are reversed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly))
 
 63. **Assembly usage**: Use of EVM assembly is error-prone and should be avoided or double-checked for correctness. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage))
 
@@ -154,7 +155,7 @@
 
 70. **Long number literals**: Number literals with many digits should be carefully checked as they are prone to error. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits))
 
-71. **Out-of-range enum: ***Solc < 0.4.5 *produced unexpected behavior with out-of-range enums*. *Check enum conversion or use a newer compiler.(see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-enum-conversion))
+71. **Out-of-range enum: \***Solc < 0.4.5 *produced unexpected behavior with out-of-range enums*. \*Check enum conversion or use a newer compiler.(see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-enum-conversion))
 
 72. **Uncalled public functions**: *Public* functions that are never called from within the contracts should be declared *external* to save gas. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external))
 
@@ -166,7 +167,7 @@
 
 76. **Redundant statements**: Statements with no effects that do not produce code may be indicative of programmer error or missing logic, which needs to be flagged for removal or addressed appropriately. (see [here](https://swcregistry.io/docs/SWC-135))
 
-77. **Storage array with signed Integers with ABIEncoderV2**: Assigning an array of signed integers to a storage array of different type can lead to data corruption in that array. This is due to a compiler bug introduced in *v0.4.7* and fixed in *v0.5.10*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html)) 
+77. **Storage array with signed Integers with ABIEncoderV2**: Assigning an array of signed integers to a storage array of different type can lead to data corruption in that array. This is due to a compiler bug introduced in *v0.4.7* and fixed in *v0.5.10*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
 78. **Dynamic constructor arguments clipped with ABIEncoderV2**: A contract's constructor which takes structs or arrays that contain dynamically sized arrays reverts or decodes to invalid data when ABIEncoderV2 is used. This is due to a compiler bug introduced in *v0.4.16* and fixed in *v0.5.9*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
@@ -182,11 +183,11 @@
 
 84. **Missing escaping in formatting with ABIEncoderV2: **String literals containing double backslash characters passed directly to external or encoding function calls can lead to a different string being used when ABIEncoderV2 is enabled. This is due to a compiler bug introduced in *v0.5.14* and fixed in *v0.6.8*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
-85. **Double shift size overflow**: Double bitwise shifts by large constants whose sum overflows 256 bits can result in unexpected values. Nested logical shift operations whose total shift size is *2**256* or more are incorrectly optimized. This only applies to shifts by numbers of bits that are compile-time constant expressions. This happens when the optimizer is used and *evmVersion >= Constantinople. *This is due to a compiler bug introduced in *v0.5.5* and fixed in *v0.5.6*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
+85. **Double shift size overflow**: Double bitwise shifts by large constants whose sum overflows 256 bits can result in unexpected values. Nested logical shift operations whose total shift size is *2\*\*256* or more are incorrectly optimized. This only applies to shifts by numbers of bits that are compile-time constant expressions. This happens when the optimizer is used and *evmVersion >= Constantinople. *This is due to a compiler bug introduced in *v0.5.5* and fixed in *v0.5.6*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
 86. **Incorrect byte instruction optimization: **The optimizer incorrectly handles byte opcodes whose second argument is 31 or a constant expression that evaluates to 31. This can result in unexpected values. This can happen when performing index access on *bytesNN* types with a compile time constant value (not index) of 31 or when using the byte opcode in inline assembly. This is due to a compiler bug introduced in *v0.5.5* and fixed in *v0.5.7*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
-87. **Essential assignments removed with Yul Optimizer** : The Yul optimizer can remove essential assignments to variables declared inside *for* loops when Yul's *continue* or *break* statement is used mostly while using inline assembly with *for* loops and *continue* and *break* statements. This is due to a compiler bug introduced in *v0.5.8*/*v0.6.0* and fixed in *v0.5.16*/*v0.6.1*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
+87. **Essential assignments removed with Yul Optimizer** : The Yul optimizer can remove essential assignments to variables declared inside *for* loops when Yul's *continue* or *break* statement is used mostly while using inline assembly with *for* loops and *continue* and *break* statements. This is due to a compiler bug introduced in *v0.5.8*/*v0.6.0* and fixed in *v0.5.16*/_v0.6.1_. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
 88. **Private methods overridden**: While private methods of base contracts are not visible and cannot be called directly from the derived contract, it is still possible to declare a function of the same name and type and thus change the behaviour of the base contract's function. This is due to a compiler bug introduced in *v0.3.0* and fixed in *v0.5.17*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
@@ -198,7 +199,7 @@
 
 92. **Memory array creation overflow**: The creation of very large memory arrays can result in overlapping memory regions and thus memory corruption. This is due to a compiler bug introduced in *v0.2.0* and fixed in *v0.6.5*. (see [here](https://solidity.ethereum.org/2020/04/06/memory-creation-overflow-bug/))
 
-93. **Calldata *****using for***: Function calls to internal library functions with calldata parameters called via "*using for"* can result in invalid data being read. This is due to a compiler bug introduced in *v0.6.9* and fixed in *v0.6.10*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
+93. **Calldata \*\*\***using for*\*\*: Function calls to internal library functions with calldata parameters called via "*using for"* can result in invalid data being read. This is due to a compiler bug introduced in *v0.6.9* and fixed in *v0.6.10\*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
 94. **Free function redefinition**: The compiler does not flag an error when two or more free functions (functions outside of a contract) with the same name and parameter types are defined in a source unit or when an imported free function alias shadows another free function with a different name but identical parameter types. This is due to a compiler bug introduced in *v0.7.1* and fixed in *v0.7.2*. (see [here](https://docs.soliditylang.org/en/v0.8.1/bugs.html))
 
@@ -208,22 +209,23 @@
 
 97. **Import upgradeable contracts in proxy-based upgradeable contracts**: Contracts imported from proxy-based upgradeable contracts should also be upgradeable where such contracts have been modified to use initializers instead of constructors. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#use-upgradeable-libraries))
 
-98. **Avoid *****selfdestruct***** or *****delegatecall***** in proxy-based upgradeable contracts**: This will cause the logic contract to be destroyed and all contract instances will end up delegating calls to an address without any code. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations))
+98. **Avoid \*\*\***selfdestruct**\*** or **\***delegatecall**\*** in proxy-based upgradeable contracts\*\*: This will cause the logic contract to be destroyed and all contract instances will end up delegating calls to an address without any code. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations))
 
 99. **State variables in proxy-based upgradeable contracts**: The declaration order/layout and type/mutability of state variables in such contracts should be preserved exactly while upgrading to prevent critical storage layout mismatch errors. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts))
 
-100. **Function ID collision between proxy/contract in proxy-based upgradeable contracts**: Malicious proxy contracts may exploit function ID collision to invoke unintended proxy functions instead of contract functions. Check for function ID collisions. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-ids-collisions) and [here](https://forum.openzeppelin.com/t/beware-of-the-proxy-learn-how-to-exploit-function-clashing/1070))
+100.  **Function ID collision between proxy/contract in proxy-based upgradeable contracts**: Malicious proxy contracts may exploit function ID collision to invoke unintended proxy functions instead of contract functions. Check for function ID collisions. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-ids-collisions) and [here](https://forum.openzeppelin.com/t/beware-of-the-proxy-learn-how-to-exploit-function-clashing/1070))
 
-101. **Function shadowing between proxy/contract in proxy-based upgradeable contracts**: Shadow functions in proxy contract prevent functions in logic contract from being invoked. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-shadowing))
+101.  **Function shadowing between proxy/contract in proxy-based upgradeable contracts**: Shadow functions in proxy contract prevent functions in logic contract from being invoked. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-shadowing))
 
 ## Audit Findings 101
-1.  **Unhandled return values of *****transfer***** and *****transferFrom***: ERC20 implementations are not always consistent. Some implementations of *transfer* and *transferFrom* could return 'false' on failure instead of reverting. It is safer to wrap such calls into *require()* statements to these failures.
+
+1.  **Unhandled return values of \*\*\***transfer**\*** and **\***transferFrom*\*\*: ERC20 implementations are not always consistent. Some implementations of *transfer* and *transferFrom* could return 'false' on failure instead of reverting. It is safer to wrap such calls into *require()\* statements to these failures.
 
     1.  Recommendation: Check the return value and revert on 0/false or use OpenZeppelin's *SafeERC20* wrapper functions
 
     2.  Medium severity finding from [Consensys Diligence Audit of Aave Protocol V2](https://consensys.net/diligence/audits/2020/09/aave-protocol-v2/#unhandled-return-values-of-transfer-and-transferfrom)
 
-2.  **Random task execution**: In a scenario where a user takes a flash loan, *_parseFLAndExecute() *gives the flash loan wrapper contract (*FLAaveV2*, *FLDyDx*) the permission to execute functions on behalf of the user's *DSProxy*. This execution permission is revoked only after the entire recipe execution is finished, which means that in case that any of the external calls along the recipe execution is malicious, it might call *executeAction()* back, i.e. Reentrancy Attack, and inject any task it wishes (e.g. take user's funds out, drain approved tokens, etc)
+2.  **Random task execution**: In a scenario where a user takes a flash loan, *\_parseFLAndExecute() *gives the flash loan wrapper contract (_FLAaveV2_, *FLDyDx*) the permission to execute functions on behalf of the user's *DSProxy*. This execution permission is revoked only after the entire recipe execution is finished, which means that in case that any of the external calls along the recipe execution is malicious, it might call *executeAction()* back, i.e. Reentrancy Attack, and inject any task it wishes (e.g. take user's funds out, drain approved tokens, etc)
 
     1.  Recommendation: A reentrancy guard (mutex) should be used to prevent such attack
 
@@ -235,7 +237,7 @@
 
     2.  Major severity finding from [Consensys Diligence Audit of Defi Saver](https://consensys.net/diligence/audits/2021/03/defi-saver/#tokens-with-more-than-18-decimal-points-will-cause-issues)
 
-4.  **Error codes of Compound's *****Comptroller.enterMarket*****, *****Comptroller.exitMarket***** are not checked**: Compound's *enterMarket*/*exitMarket* functions return an error code instead of reverting in case of failure. DeFi Saver smart contracts never check for the error codes returned from Compound smart contracts.
+4.  **Error codes of Compound's \*\*\***Comptroller.enterMarket**\***, **\***Comptroller.exitMarket**\*** are not checked\**: Compound's *enterMarket*/*exitMarket\* functions return an error code instead of reverting in case of failure. DeFi Saver smart contracts never check for the error codes returned from Compound smart contracts.
 
     1.  Recommendation: Caller contract should revert in case the error code is not 0
 
@@ -247,25 +249,25 @@
 
     2.  Medium severity finding from [Consensys Diligence Audit of Defi Saver](https://consensys.net/diligence/audits/2021/03/defi-saver/#reversed-order-of-parameters-in-allowance-function-call)
 
-6.  **Token approvals can be stolen in *****DAOfiV1Router01.addLiquidity()***: *DAOfiV1Router01.addLiquidity()* creates the desired pair contract if it does not already exist, then transfers tokens into the pair and calls *DAOfiV1Pair.deposit()*. There is no validation of the address to transfer tokens from, so an attacker could pass in any address with nonzero token approvals to *DAOfiV1Router*. This could be used to add liquidity to a pair contract for which the attacker is the *pairOwner*, allowing the stolen funds to be retrieved using DAOfiV1Pair.withdraw().
+6.  **Token approvals can be stolen in \*\*\***DAOfiV1Router01.addLiquidity()*\*\*: *DAOfiV1Router01.addLiquidity()* creates the desired pair contract if it does not already exist, then transfers tokens into the pair and calls *DAOfiV1Pair.deposit()*. There is no validation of the address to transfer tokens from, so an attacker could pass in any address with nonzero token approvals to *DAOfiV1Router*. This could be used to add liquidity to a pair contract for which the attacker is the *pairOwner\*, allowing the stolen funds to be retrieved using DAOfiV1Pair.withdraw().
 
     1.  Recommendation: Transfer tokens from msg.sender instead of lp.sender
 
     2.  Critical severity finding from [Consensys Diligence Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#token-approvals-can-be-stolen-in-daofiv1router01-addliquidity)
 
-7.  ***swapExactTokensForETH***** checks the wrong return value**: Instead of checking that the amount of tokens received from a swap is greater than the minimum amount expected from this swap, it calculates the difference between the initial receiver's balance and the balance of the router
+7.  **\*swapExactTokensForETH\*\*\*** checks the wrong return value\*\*: Instead of checking that the amount of tokens received from a swap is greater than the minimum amount expected from this swap, it calculates the difference between the initial receiver's balance and the balance of the router
 
     1.  Recommendation: Check the intended values
 
     2.  Major severity finding from [Consensys Diligence Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#the-swapexacttokensforeth-checks-the-wrong-return-value)
 
-8.  ***DAOfiV1Pair.deposit()***** accepts deposits of zero, blocking the pool**: *DAOfiV1Pair.deposit()* is used to deposit liquidity into the pool. Only a single deposit can be made, so no liquidity can ever be added to a pool where deposited == true. The deposit() function does not check for a nonzero deposit amount in either token, so a malicious user that does not hold any of the *baseToken* or *quoteToken* can lock the pool by calling deposit() without first transferring any funds to the pool.
+8.  **\*DAOfiV1Pair.deposit()\*\*\*** accepts deposits of zero, blocking the pool\**: *DAOfiV1Pair.deposit()* is used to deposit liquidity into the pool. Only a single deposit can be made, so no liquidity can ever be added to a pool where deposited == true. The deposit() function does not check for a nonzero deposit amount in either token, so a malicious user that does not hold any of the *baseToken* or *quoteToken\* can lock the pool by calling deposit() without first transferring any funds to the pool.
 
     1.  Recommendation: Require a minimum deposit amount with non-zero checks
 
     2.  Medium severity finding from [Consensys Diligence Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#daofiv1pair-deposit-accepts-deposits-of-zero-blocking-the-pool)
 
-9.  ***GenesisGroup.commit***** overwrites previously-committed values**: The amount stored in the recipient's *committedFGEN* balance overwrites any previously-committed value. Additionally, this also allows anyone to commit an amount of "0" to any account, deleting their commitment entirely.
+9.  **\*GenesisGroup.commit\*\*\*** overwrites previously-committed values\**: The amount stored in the recipient's *committedFGEN\* balance overwrites any previously-committed value. Additionally, this also allows anyone to commit an amount of "0" to any account, deleting their commitment entirely.
 
     1.  Recommendation: Ensure the committed amount is added to the existing commitment.
 
@@ -277,19 +279,19 @@
 
     2.  Critical severity finding from [Consensys Diligence Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#purchasing-and-committing-still-possible-after-launch)
 
-11. ***UniswapIncentive***** overflow on pre-transfer hooks**: Before a token transfer is performed, Fei performs some combination of mint/burn operations via *UniswapIncentive.incentivize*. Both *incentivizeBuy* and *incentivizeSell* calculate buy/sell incentives using overflow-prone math, then mint / burn from the target according to the results. This may have unintended consequences, like allowing a caller to mint tokens before transferring them, or burn tokens from their recipient.
+11. **\*UniswapIncentive\*\*\*** overflow on pre-transfer hooks\**: Before a token transfer is performed, Fei performs some combination of mint/burn operations via *UniswapIncentive.incentivize*. Both *incentivizeBuy* and *incentivizeSell\* calculate buy/sell incentives using overflow-prone math, then mint / burn from the target according to the results. This may have unintended consequences, like allowing a caller to mint tokens before transferring them, or burn tokens from their recipient.
 
     1.  Recommendation: Ensure casts in *getBuyIncentive* and *getSellPenalty* do not overflow
 
     2.  Major severity finding from [Consensys Diligence Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#uniswapincentive-overflow-on-pre-transfer-hooks)
 
-12. ***BondingCurve***** allows users to acquire FEI before launch**: allocate can be called before genesis launch, as long as the contract holds some nonzero PCV. By force-sending the contract 1 wei, anyone can bypass the majority of checks and actions in allocate, and mint themselves FEI each time the timer expires.
+12. **\*BondingCurve\*\*\*** allows users to acquire FEI before launch\*\*: allocate can be called before genesis launch, as long as the contract holds some nonzero PCV. By force-sending the contract 1 wei, anyone can bypass the majority of checks and actions in allocate, and mint themselves FEI each time the timer expires.
 
     1.  Recommendation: Prevent allocate from being called before genesis launch
 
     2.  Medium severity finding from [Consensys Diligence Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#bondingcurve-allows-users-to-acquire-fei-before-launch)
 
-13. ***Timed.isTimeEnded***** returns true if the timer has not been initialized**: *Timed* initialization is a 2-step process: 1) *Timed.duration* is set in the constructor 2) *Timed.startTime* is set when the method *_initTimed* is called. Before this second method is called, *isTimeEnded*() calculates remaining time using a *startTime* of 0, resulting in the method returning true for most values, even though the timer has not technically been started.
+13. **\*Timed.isTimeEnded\*\*\*** returns true if the timer has not been initialized\**: *Timed* initialization is a 2-step process: 1) *Timed.duration* is set in the constructor 2) *Timed.startTime* is set when the method *\_initTimed* is called. Before this second method is called, *isTimeEnded*() calculates remaining time using a *startTime\* of 0, resulting in the method returning true for most values, even though the timer has not technically been started.
 
     1.  Recommendation: If Timed has not been initialized, *isTimeEnded*() should return false, or revert
 
@@ -301,13 +303,13 @@
 
     2.  Medium severity finding from [Consensys Diligence Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#overflow-underflow-protection)
 
-15. **Unchecked return value for *****IWETH.transfer***** call**: In *EthUniswapPCVController*, there is a call to *IWETH.transfer* that does not check the return value. It is usually good to add a require-statement that checks the return value or to use something like *safeTransfer*; unless one is sure the given token reverts in case of a failure.
+15. **Unchecked return value for \*\*\***IWETH.transfer**\*** call\**: In *EthUniswapPCVController*, there is a call to *IWETH.transfer* that does not check the return value. It is usually good to add a require-statement that checks the return value or to use something like *safeTransfer\*; unless one is sure the given token reverts in case of a failure.
 
     1.  Recommendation: Consider adding a require-statement or using *safeTransfer*
 
     2.  Medium severity finding from [Consensys Diligence Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#unchecked-return-value-for-iweth-transfer-call)
 
-16. ***GenesisGroup.emergencyExit***** remains functional after launch**: *emergencyExit* is intended as an escape mechanism for users in the event the genesis launch method fails or is frozen. *emergencyExit* becomes callable 3 days after launch is callable. These two methods are intended to be mutually-exclusive, but are not: either method remains callable after a successful call to the other. This may result in accounting edge cases.
+16. **\*GenesisGroup.emergencyExit\*\*\*** remains functional after launch\**: *emergencyExit* is intended as an escape mechanism for users in the event the genesis launch method fails or is frozen. *emergencyExit\* becomes callable 3 days after launch is callable. These two methods are intended to be mutually-exclusive, but are not: either method remains callable after a successful call to the other. This may result in accounting edge cases.
 
     1.  Recommendation: 1) Ensure launch cannot be called if *emergencyExit* has been called 2) Ensure *emergencyExit* cannot be called if launch has been called
 
@@ -319,7 +321,7 @@
 
     2.  Major severity finding from [Consensys Diligence Audit of bitbank](https://consensys.net/diligence/audits/2020/11/bitbank/#erc20-tokens-with-no-return-value-will-fail-to-transfer)
 
-18. **Reentrancy vulnerability in *****MetaSwap.swap()***: If an attacker is able to reenter *swap()*, they can execute their own trade using the same tokens and get all the tokens for themselves.
+18. **Reentrancy vulnerability in \*\*\***MetaSwap.swap()*\*\*: If an attacker is able to reenter *swap()\*, they can execute their own trade using the same tokens and get all the tokens for themselves.
 
     1.  Recommendation: Use a simple reentrancy guard, such as OpenZeppelin's ReentrancyGuard to prevent reentrancy in *MetaSwap.swap()*
 
@@ -337,7 +339,7 @@
 
     2.  Medium severity finding from [Consensys Diligence Audit of MetaSwap](https://consensys.net/diligence/audits/2020/08/metaswap/#owner-can-front-run-traders-by-updating-adapters)
 
-21. **Users can collect interest from *****SavingsContract***** by only staking mTokens momentarily**: The *SAVE* contract allows users to deposit *mAssets* in return for lending yield and swap fees. When depositing *mAsset*, users receive a "credit" tokens at the momentary credit/*mAsset* exchange rate which is updated at every deposit. However, the smart contract enforces a minimum timeframe of 30 minutes in which the interest rate will not be updated. A user who deposits shortly before the end of the timeframe will receive credits at the stale interest rate and can immediately trigger an update of the rate and withdraw at the updated (more favorable) rate after the 30 minutes window. As a result, it would be possible for users to benefit from interest payouts by only staking mAssets momentarily and using them for other purposes the rest of the time.
+21. **Users can collect interest from \*\*\***SavingsContract**\*** by only staking mTokens momentarily\**: The *SAVE* contract allows users to deposit *mAssets* in return for lending yield and swap fees. When depositing *mAsset*, users receive a "credit" tokens at the momentary credit/*mAsset\* exchange rate which is updated at every deposit. However, the smart contract enforces a minimum timeframe of 30 minutes in which the interest rate will not be updated. A user who deposits shortly before the end of the timeframe will receive credits at the stale interest rate and can immediately trigger an update of the rate and withdraw at the updated (more favorable) rate after the 30 minutes window. As a result, it would be possible for users to benefit from interest payouts by only staking mAssets momentarily and using them for other purposes the rest of the time.
 
     1.  Recommendation: Remove the 30 minutes window such that every deposit also updates the exchange rate between credits and tokens.
 
@@ -355,19 +357,19 @@
 
     2.  Major severity finding from [Consensys Diligence Audit of Shell Protocol](https://consensys.net/diligence/audits/2020/06/shell-protocol/#certain-functions-lack-input-validation-routines)
 
-24. **Remove *****Loihi***** methods that can be used as backdoors by the administrator**: There are several functions in *Loihi* that give extreme powers to the shell administrator. The most dangerous set of those is the ones granting the capability to add assimilators. Since assimilators are essentially a proxy architecture to delegate code to several different implementations of the same interface, the administrator could, intentionally or unintentionally, deploy malicious or faulty code in the implementation of an assimilator. This means that the administrator is essentially totally trusted to not run code that, for example, drains the whole pool or locks up the users' and LPs' tokens. In addition to these, the function *safeApprove* allows the administrator to move any of the tokens the contract holds to any address regardless of the balances any of the users have. This can also be used by the owner as a backdoor to completely drain the contract.
+24. **Remove \*\*\***Loihi**\*** methods that can be used as backdoors by the administrator\**: There are several functions in *Loihi* that give extreme powers to the shell administrator. The most dangerous set of those is the ones granting the capability to add assimilators. Since assimilators are essentially a proxy architecture to delegate code to several different implementations of the same interface, the administrator could, intentionally or unintentionally, deploy malicious or faulty code in the implementation of an assimilator. This means that the administrator is essentially totally trusted to not run code that, for example, drains the whole pool or locks up the users' and LPs' tokens. In addition to these, the function *safeApprove\* allows the administrator to move any of the tokens the contract holds to any address regardless of the balances any of the users have. This can also be used by the owner as a backdoor to completely drain the contract.
 
     1.  Recommendation: Remove the *safeApprove* function and, instead, use a trustless escape-hatch mechanism. For the assimilator addition functions, our recommendation is that they are made completely internal, only callable in the constructor, at deploy time. Even though this is not a big structural change (in fact, it reduces the attack surface), it is, indeed, a feature loss. However, this is the only way to make each shell a time-invariant system. This would not only increase Shell's security but also would greatly improve the trust the users have in the protocol since, after deployment, the code is now static and auditable.
 
     2.  Major severity finding from [Consensys Diligence Audit of Shell Protocol](https://consensys.net/diligence/audits/2020/06/shell-protocol/#remove-loihi-methods-that-can-be-used-as-backdoors-by-the-administrator)
 
-25. **A reverting fallback function will lock up all payouts**: In *BoxExchange.sol*, the internal function *_transferEth*() reverts if the transfer does not succeed. The *_payment*() function processes a list of transfers to settle the transactions in an *ExchangeBox*. If any of the recipients of an ETH transfer is a smart contract that reverts, then the entire payout will fail and will be unrecoverable.
+25. **A reverting fallback function will lock up all payouts**: In *BoxExchange.sol*, the internal function *\_transferEth*() reverts if the transfer does not succeed. The *\_payment*() function processes a list of transfers to settle the transactions in an *ExchangeBox*. If any of the recipients of an ETH transfer is a smart contract that reverts, then the entire payout will fail and will be unrecoverable.
 
     1.  Recommendation: 1) Implement a queuing mechanism to allow buyers/sellers to initiate the withdrawal on their own using a 'pull-over-push pattern.' 2) Ignore a failed transfer and leave the responsibility up to users to receive them properly.
 
     2.  Critical severity finding from [Consensys Diligence Audit of Lien Protocol](https://consensys.net/diligence/audits/2020/05/lien-protocol/#a-reverting-fallback-function-will-lock-up-all-payouts)
 
-26. ***Saferagequit***** makes you lose funds**: *safeRagequit* and *ragequit* functions are used for withdrawing funds from the LAO. The difference between them is that ragequit function tries to withdraw all the allowed tokens and *safeRagequit* function withdraws only some subset of these tokens, defined by the user. It's needed in case the user or *GuildBank* is blacklisted in some of the tokens and the transfer reverts. The problem is that even though you can quit in that case, you'll lose the tokens that you exclude from the list. To be precise, the tokens are not completely lost, they will belong to the LAO and can still potentially be transferred to the user who quit. But that requires a lot of trust, coordination, time and anyone can steal some part of these tokens.
+26. **\*Saferagequit\*\*\*** makes you lose funds\**: *safeRagequit* and *ragequit* functions are used for withdrawing funds from the LAO. The difference between them is that ragequit function tries to withdraw all the allowed tokens and *safeRagequit* function withdraws only some subset of these tokens, defined by the user. It's needed in case the user or *GuildBank\* is blacklisted in some of the tokens and the transfer reverts. The problem is that even though you can quit in that case, you'll lose the tokens that you exclude from the list. To be precise, the tokens are not completely lost, they will belong to the LAO and can still potentially be transferred to the user who quit. But that requires a lot of trust, coordination, time and anyone can steal some part of these tokens.
 
     1.  Recommendation: Implementing pull pattern for token withdrawals should solve the issue. Users will be able to quit the LAO and burn their shares but still keep their tokens in the LAO's contract for some time if they can't withdraw them right now.
 
@@ -391,7 +393,7 @@
 
     2.  Major severity finding from [Consensys Diligence Audit of The Lao](https://consensys.net/diligence/audits/2020/01/the-lao)
 
-30. **Whitelisted tokens limit**: *_ragequit* function is iterating over all whitelisted tokens. If the number of tokens is too big, a transaction can run out of gas and all funds will be blocked forever.
+30. **Whitelisted tokens limit**: *\_ragequit* function is iterating over all whitelisted tokens. If the number of tokens is too big, a transaction can run out of gas and all funds will be blocked forever.
 
     1.  Recommendation: A simple solution would be just limiting the number of whitelisted tokens. If the intention is to invest in many new tokens over time, and it's not an option to limit the number of whitelisted tokens, it's possible to add a function that removes tokens from the whitelist. For example, it's possible to add a new type of proposal that is used to vote on token removal if the balance of this token is zero. Before voting for that, shareholders should sell all the balance of that token.
 
@@ -421,19 +423,19 @@
 
     2.  High Risk severity finding from [ToB's Audit of Origin Dollar](https://github.com/trailofbits/publications/blob/master/reviews/OriginDollar.pdf)
 
-35. **Proposal transactions can be executed separately and block *****Proposal.execute***** call**: Missing access controls in the *Timelock.executeTransaction* function allow Proposal transactions to be executed separately, circumventing the *Governor.execute* function.
+35. **Proposal transactions can be executed separately and block \*\*\***Proposal.execute**\*** call\**: Missing access controls in the *Timelock.executeTransaction* function allow Proposal transactions to be executed separately, circumventing the *Governor.execute\* function.
 
     1.  Recommendation: Short term, only allow the admin to call *Timelock.executeTransaction*
 
     2.  High Risk severity finding from [ToB's Audit of Origin Dollar](https://github.com/trailofbits/publications/blob/master/reviews/OriginDollar.pdf)
 
-36. **Proposals could allow *****Timelock.admin***** takeover**: The Governor contract contains special functions to let the guardian queue a transaction to change the *Timelock.admin*. However, a regular Proposal is also allowed to contain a transaction to change the *Timelock.admin*. This poses an unnecessary risk in that an attacker could create a Proposal to change the *Timelock.admin*.
+36. **Proposals could allow \*\*\***Timelock.admin**\*** takeover\**: The Governor contract contains special functions to let the guardian queue a transaction to change the *Timelock.admin*. However, a regular Proposal is also allowed to contain a transaction to change the *Timelock.admin*. This poses an unnecessary risk in that an attacker could create a Proposal to change the *Timelock.admin\*.
 
     1.  Recommendation: Short term, add a check that prevents *setPendingAdmin* to be included in a Proposal
 
     2.  High Risk severity finding from [ToB's Audit of Origin Dollar](https://github.com/trailofbits/publications/blob/master/reviews/OriginDollar.pdf)
 
-37. **Reentrancy and untrusted contract call in *****mintMultiple***: Missing checks and no reentrancy prevention allow untrusted contracts to be called from *mintMultiple*. This could be used by an attacker to drain the contracts.
+37. **Reentrancy and untrusted contract call in \*\*\***mintMultiple*\*\*: Missing checks and no reentrancy prevention allow untrusted contracts to be called from *mintMultiple\*. This could be used by an attacker to drain the contracts.
 
     1.  Recommendation: Short term, add checks that cause *mintMultiple* to revert if the amount is zero or the asset is not supported. Add a reentrancy guard to the *mint*, *mintMultiple*, *redeem*, and *redeemAll* functions. Long term, make use of Slither which will flag the reentrancy. Or even better, use Crytic and incorporate static analysis checks into your CI/CD pipeline. Add reentrancy guards to all non-view functions callable by anyone. Make sure to always revert a transaction if an input is incorrect. Disallow calling untrusted contracts.
 
@@ -463,21 +465,21 @@
 
     2.  High Risk severity finding from [ToB's Audit of Origin Dollar](https://github.com/trailofbits/publications/blob/master/reviews/OriginDollar.pdf)
 
-42. **Flash minting can be used to redeem *****fyDAI***: The flash-minting feature from the *fyDAI* token can be used to redeem an arbitrary amount of funds from a mature token.
+42. **Flash minting can be used to redeem \*\*\***fyDAI*\*\*: The flash-minting feature from the *fyDAI\* token can be used to redeem an arbitrary amount of funds from a mature token.
 
     1.  Recommendation: Short term, disallow calls to redeem in the *YDai* and Unwind contracts during flash minting. Long term, do not include operations that allow any user to manipulate an arbitrary amount of funds, even if it is in a single transaction. This will prevent attackers from gaining leverage to manipulate the market and break internal invariants.
 
     2.  Medium Risk severity finding from [ToB's Audit of Yield Protocol](https://github.com/trailofbits/publications/blob/master/reviews/YieldProtocol.pdf)
 
-43. **Lack of *****chainID***** validation allows signatures to be re-used across forks**: *YDai* implements the draft ERC 2612 via the *ERC20Permit* contract it inherits from. This allows a third party to transmit a signature from a token holder that modifies the ERC20 allowance for a particular user. These signatures used in calls to permit in *ERC20Permit* do not account for chain splits. The *chainID* is included in the domain separator. However, it is not updatable and not included in the signed data as part of the permit call. As a result, if the chain forks after deployment, the signed message may be considered valid on both forks.
+43. **Lack of \*\*\***chainID**\*** validation allows signatures to be re-used across forks\**: *YDai* implements the draft ERC 2612 via the *ERC20Permit* contract it inherits from. This allows a third party to transmit a signature from a token holder that modifies the ERC20 allowance for a particular user. These signatures used in calls to permit in *ERC20Permit* do not account for chain splits. The *chainID\* is included in the domain separator. However, it is not updatable and not included in the signed data as part of the permit call. As a result, if the chain forks after deployment, the signed message may be considered valid on both forks.
 
     1.  Recommendation: Short term, include the *chainID* opcode in the permit schema. This will make replay attacks impossible in the event of a post-deployment hard fork. Long term, document and carefully review any signature schemas, including their robustness to replay on different wallets, contracts, and blockchains. Make sure users are aware of signing best practices and the danger of signing messages from untrusted sources.
 
     2.  High Risk severity finding from [ToB's Audit of Yield Protocol](https://github.com/trailofbits/publications/blob/master/reviews/YieldProtocol.pdf)
 
-44. **Lack of a contract existence check allows token theft**: Since there's no existence check for contracts that interact with external tokens, an attacker can steal funds by registering a token that's not yet deployed. *_safeTransferFrom* will return success even if the token is not yet deployed, or was self-destructed. An attacker that knows the address of a future token can register the token in Hermez, and deposit any amount prior to the token deployment. Once the contract is deployed and tokens have been deposited in Hermez, the attacker can steal the funds. The address of a contract to be deployed can be determined by knowing the address of its deployer.
+44. **Lack of a contract existence check allows token theft**: Since there's no existence check for contracts that interact with external tokens, an attacker can steal funds by registering a token that's not yet deployed. *\_safeTransferFrom* will return success even if the token is not yet deployed, or was self-destructed. An attacker that knows the address of a future token can register the token in Hermez, and deposit any amount prior to the token deployment. Once the contract is deployed and tokens have been deposited in Hermez, the attacker can steal the funds. The address of a contract to be deployed can be determined by knowing the address of its deployer.
 
-    1.  Recommendation: Short term, check for contract existence in _ *safeTransferFrom*. Add a similar check for any low-level calls, including in *WithdrawalDelayer*. This will prevent an attacker from listing and depositing tokens in a contract that is not yet deployed. Long term, carefully review the Solidity documentation, especially the Warnings section. The Solidity documentation warns: The low-level call, *delegatecall* and *callcode* will return success if the called account is non-existent, as part of the design of EVM. Existence must be checked prior to calling if desired.
+    1.  Recommendation: Short term, check for contract existence in \_ *safeTransferFrom*. Add a similar check for any low-level calls, including in *WithdrawalDelayer*. This will prevent an attacker from listing and depositing tokens in a contract that is not yet deployed. Long term, carefully review the Solidity documentation, especially the Warnings section. The Solidity documentation warns: The low-level call, *delegatecall* and *callcode* will return success if the called account is non-existent, as part of the design of EVM. Existence must be checked prior to calling if desired.
 
     2.  High Risk severity finding from [ToB's Audit of Hermez](https://github.com/trailofbits/publications/blob/master/reviews/hermez.pdf)
 
@@ -505,13 +507,13 @@
 
     2.  High Risk severity finding from [ToB's Audit of Hermez](https://github.com/trailofbits/publications/blob/master/reviews/hermez.pdf)
 
-49. **Missing validation of *****_owner***** argument could indefinitely lock owner role**: A lack of input validation of the *_owner* argument in both the constructor and *setOwner* functions could permanently lock the owner role, requiring a costly redeploy. To resolve an incorrect owner issue, Uniswap would need to redeploy the factory contract and re-add pairs and liquidity. Users might not be happy to learn of these actions, which could lead to reputational damage. Certain users could also decide to continue using the original factory and pair contracts, in which owner functions cannot be called. This could lead to the concurrent use of two versions of Uniswap, one with the original factory contract and no valid owner and another in which the owner was set correctly. Trail of Bits identified four distinct cases in which an incorrect owner is set: 1) Passing address(0) to the constructor 2) Passing address(0) to the *setOwner* function 3) Passing an incorrect address to the constructor 4)  Passing an incorrect address to the *setOwner* function.
+49. **Missing validation of \*\*\***\_owner**\*** argument could indefinitely lock owner role\*_: A lack of input validation of the _\_owner* argument in both the constructor and *setOwner* functions could permanently lock the owner role, requiring a costly redeploy. To resolve an incorrect owner issue, Uniswap would need to redeploy the factory contract and re-add pairs and liquidity. Users might not be happy to learn of these actions, which could lead to reputational damage. Certain users could also decide to continue using the original factory and pair contracts, in which owner functions cannot be called. This could lead to the concurrent use of two versions of Uniswap, one with the original factory contract and no valid owner and another in which the owner was set correctly. Trail of Bits identified four distinct cases in which an incorrect owner is set: 1) Passing address(0) to the constructor 2) Passing address(0) to the *setOwner* function 3) Passing an incorrect address to the constructor 4)  Passing an incorrect address to the *setOwner\* function.
 
     1.  Recommendation: Several improvements could prevent the four above mentioned cases: 1) Designate *msg.sender* as the initial owner, and transfer ownership to the chosen owner after deployment. 2) Implement a two-step ownership-change process through which the new owner needs to accept ownership. 3) If it needs to be possible to set the owner to address(0), implement a *renounceOwnership* function.
 
     2.  Medium Risk severity finding from [ToB's Audit of Uniswap V3](https://github.com/Uniswap/uniswap-v3-core/blob/main/audits/tob/audit.pdf)
 
-50. **Incorrect comparison enables swapping and token draining at no cost**: An incorrect comparison in the swap function allows the swap to succeed even if no tokens are paid. This issue could be used to drain any pool of all of its tokens at no cost. The swap function calculates how many tokens the initiator (*msg.sender*) needs to pay (*amountIn*) to receive the requested amount of tokens (*amountOut*). It then calls the *uniswapV3SwapCallback* function on the initiator's account, passing in the amount of tokens to be paid. The callback function should then transfer at least the requested amount of tokens to the pool contract. Afterward, a require inside the swap function verifies that the correct amount of tokens (amountIn) has been transferred to the pool. However, the check inside the require is incorrect. The operand used is >= instead of <=.
+50. **Incorrect comparison enables swapping and token draining at no cost**: An incorrect comparison in the swap function allows the swap to succeed even if no tokens are paid. This issue could be used to drain any pool of all of its tokens at no cost. The swap function calculates how many tokens the initiator (_msg.sender_) needs to pay (_amountIn_) to receive the requested amount of tokens (_amountOut_). It then calls the *uniswapV3SwapCallback* function on the initiator's account, passing in the amount of tokens to be paid. The callback function should then transfer at least the requested amount of tokens to the pool contract. Afterward, a require inside the swap function verifies that the correct amount of tokens (amountIn) has been transferred to the pool. However, the check inside the require is incorrect. The operand used is >= instead of <=.
 
     1.  Recommendation: Replace >= with <= in the require statement.
 
@@ -541,7 +543,7 @@
 
     2.  High Risk severity finding from [ToB's Audit of Uniswap V3](https://github.com/Uniswap/uniswap-v3-core/blob/main/audits/tob/audit.pdf)
 
-55. **Use of undefined behavior in equality check**: On the left-hand side of the equality check, there is an assignment of the variable *outputAmt_*. The right-hand side uses the same variable. The Solidity 0.7.3. documentation states that "The evaluation order of expressions is not specified (more formally, the order in which the children of one node in the expression tree are evaluated is not specified, but they are of course evaluated before the node itself). It is only guaranteed that statements are executed in order and short-circuiting for boolean expressions is done" which means that this check constitutes an instance of undefined behavior. As such, the behavior of this code is not specified and could change in a future release of Solidity.
+55. **Use of undefined behavior in equality check**: On the left-hand side of the equality check, there is an assignment of the variable *outputAmt\_*. The right-hand side uses the same variable. The Solidity 0.7.3. documentation states that "The evaluation order of expressions is not specified (more formally, the order in which the children of one node in the expression tree are evaluated is not specified, but they are of course evaluated before the node itself). It is only guaranteed that statements are executed in order and short-circuiting for boolean expressions is done" which means that this check constitutes an instance of undefined behavior. As such, the behavior of this code is not specified and could change in a future release of Solidity.
 
     1.  Recommendation: Short term, rewrite the if statement such that it does not use and assign the same variable in an equality check. Long term, ensure that the codebase does not contain undefined Solidity or EVM behavior.
 
@@ -559,19 +561,19 @@
 
     2.  Medium Risk severity finding from [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-58. **Assimilators use a deprecated Chainlink API**: The old version of the Chainlink price feed API (*AggregatorInterface*) is used throughout the contracts and tests. For example, the deprecated function *latestAnswer* is used. This function is not present in the latest API reference (*AggregatorInterfaceV3*). However, it is present in the deprecated API reference. In the worst-case scenario, the deprecated contract could cease to report the latest values, which would very likely cause liquidity providers to incur losses.
+58. **Assimilators use a deprecated Chainlink API**: The old version of the Chainlink price feed API (_AggregatorInterface_) is used throughout the contracts and tests. For example, the deprecated function *latestAnswer* is used. This function is not present in the latest API reference (_AggregatorInterfaceV3_). However, it is present in the deprecated API reference. In the worst-case scenario, the deprecated contract could cease to report the latest values, which would very likely cause liquidity providers to incur losses.
 
     1.  Recommendation: Use the latest stable versions of any external libraries or contracts leveraged by the codebase
 
     2.  Undetermined Risk severity finding from [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-59. ***cancelOrdersUpTo***** can be used to permanently block future orders**: Users can cancel an arbitrary number of future orders, and this operation is not reversible. The *cancelOrdersUpTo* function (Figure 3.1) can cancel an arbitrary number of orders in a single, fixed-size transaction. This function uses a parameter to discard any order with salt less than the input value. However, *cancelOrdersUpTo* can cancel future orders if it is called with a very large value (e.g., *MAX_UINT256* - 1). This operation will cancel future orders, except for the one with salt equal to *MAX_UINT256*.
+59. **\*cancelOrdersUpTo\*\*\*** can be used to permanently block future orders\**: Users can cancel an arbitrary number of future orders, and this operation is not reversible. The *cancelOrdersUpTo* function (Figure 3.1) can cancel an arbitrary number of orders in a single, fixed-size transaction. This function uses a parameter to discard any order with salt less than the input value. However, *cancelOrdersUpTo* can cancel future orders if it is called with a very large value (e.g., *MAX_UINT256* - 1). This operation will cancel future orders, except for the one with salt equal to *MAX_UINT256\*.
 
     1.  Recommendation: Properly document this behavior to warn users about the permanent effects of *cancelOrderUpTo* on future orders. Alternatively, disallow the cancelation of future orders.
 
     2.  High Risk severity finding from [ToB's Audit of 0x Protocol](https://github.com/trailofbits/publications/blob/master/reviews/0x-protocol.pdf)
 
-60. **Specification-Code mismatch for *****AssetProxyOwner***** timelock period**: The specification for *AssetProxyOwner* says: "The *AssetProxyOwner* is a time-locked multi-signature wallet that has permission to perform administrative functions within the protocol. Submitted transactions must pass a 2 week timelock before they are executed." The *MultiSigWalletWithTimeLock*.*sol* and *AssetProxyOwner*.*sol* contracts' timelock-period implementation/usage does not enforce the two-week period, but is instead configurable by the wallet owner without any range checks. Either the specification is outdated (most likely), or this is a serious flaw.
+60. **Specification-Code mismatch for \*\*\***AssetProxyOwner**\*** timelock period\**: The specification for *AssetProxyOwner* says: "The *AssetProxyOwner* is a time-locked multi-signature wallet that has permission to perform administrative functions within the protocol. Submitted transactions must pass a 2 week timelock before they are executed." The *MultiSigWalletWithTimeLock*.*sol* and *AssetProxyOwner*.*sol\* contracts' timelock-period implementation/usage does not enforce the two-week period, but is instead configurable by the wallet owner without any range checks. Either the specification is outdated (most likely), or this is a serious flaw.
 
     1.  Recommendation: Short term, implement the necessary range checks to enforce the timelock described in the specification. Otherwise correct the specification to match the intended behavior. Long term, make sure implementation and specification are in sync. Use Echidna or Manticore to test that your code properly implements the specification.
 
@@ -589,7 +591,7 @@
 
     2.  Medium Risk severity finding from [ToB's Audit of 0x Protocol](https://github.com/trailofbits/publications/blob/master/reviews/0x-protocol.pdf)
 
-63. ***setSignatureValidatorApproval***** race condition may be exploitable**: If a validator is compromised, a race condition in the signature validator approval logic becomes exploitable. The *setSignatureValidatorApproval* function (Figure 4.1) allows users to delegate the signature validation to a contract. However, if the validator is compromised, a race condition in this function could allow an attacker to validate any amount of malicious transactions.
+63. **\*setSignatureValidatorApproval\*\*\*** race condition may be exploitable\**: If a validator is compromised, a race condition in the signature validator approval logic becomes exploitable. The *setSignatureValidatorApproval\* function (Figure 4.1) allows users to delegate the signature validation to a contract. However, if the validator is compromised, a race condition in this function could allow an attacker to validate any amount of malicious transactions.
 
     1.  Recommendation: Short term, document this behavior to make sure users are aware of the inherent risks of using validators in case of a compromise. Long term, consider monitoring the blockchain using the *SignatureValidatorApproval* events to catch front-running attacks.
 
@@ -607,7 +609,7 @@
 
     2.  Medium Risk severity finding from [ToB's Audit of 0x Protocol](https://github.com/trailofbits/publications/blob/master/reviews/0x-protocol.pdf)
 
-66. **Calls to *****setParams***** may set invalid values and produce unexpected behavior in the staking contracts**: Certain parameters of the contracts can be configured to invalid values, causing a variety of issues and breaking expected interactions between contracts. *setParams* allows the owner of the staking contracts to reparameterize critical parameters. However, reparameterization lacks sanity/threshold/limit checks on all parameters.
+66. **Calls to \*\*\***setParams**\*** may set invalid values and produce unexpected behavior in the staking contracts\**: Certain parameters of the contracts can be configured to invalid values, causing a variety of issues and breaking expected interactions between contracts. *setParams\* allows the owner of the staking contracts to reparameterize critical parameters. However, reparameterization lacks sanity/threshold/limit checks on all parameters.
 
     1.  Recommendation: Add proper validation checks on all parameters in *setParams*. If the validation procedure is unclear or too complex to implement on-chain, document the potential issues that could produce invalid values.
 
@@ -619,7 +621,7 @@
 
     2.  High Risk severity finding from [Sigma Prime's Audit of Synthetix EtherCollateral](https://github.com/sigp/public-audits/blob/master/synthetix/ethercollateral/review.pdf)
 
-68. **Improper Storage Management of Open Loan Accounts**: When loans are open, the associated account address gets added to the *accountsWithOpenLoans* array regardless of whether the account already has a loan/is already included in the array. Additionally, it is possible for a malicious actor to create a denial of service condition exploiting the unbound storage array in *accountsSynthLoans*. 
+68. **Improper Storage Management of Open Loan Accounts**: When loans are open, the associated account address gets added to the *accountsWithOpenLoans* array regardless of whether the account already has a loan/is already included in the array. Additionally, it is possible for a malicious actor to create a denial of service condition exploiting the unbound storage array in *accountsSynthLoans*.
 
     1.  Recommendation: 1) Consider changing the *storeLoan* function to only push the account to the *accountsWithOpenLoans* array if the loan to be stored is the first one for that particular account ; 2) Introduce a limit to the number of loans each account can have.
 
@@ -631,19 +633,19 @@
 
     2.  Medium Risk severity finding from [Sigma Prime's Audit of Synthetix EtherCollateral](https://github.com/sigp/public-audits/blob/master/synthetix/ethercollateral/review.pdf)
 
-70. **Inadequate Proxy Implementation Preventing Contract Upgrades**: The *TokenImpl* smart contract requires Owner , name , symbol and decimals of *TokenImpl* to be set by the *TokenImpl* constructor. Consider two smart contracts, contract A and contract B . If contract A performs a delegatecall on contract B , the state/storage variables of contract B are not accessible by contract A . Therefore, when *TokenProxy* targets an implementation of *TokenImpl* and interacts with it via a *DELEGATECALL* , it will not be able to access any of the state variables of the *TokenImpl* contract. Instead, the *TokenProxy* will access its local storage, which does not contain the variables set in the constructor of the *TokenImpl* implementation. When the *TokenProxy* contract is constructed it will only initialize and set two storage slots: - The proxy admin address ( *_setAdmin* internal function) - The token implementation address ( *_setImplementation* private function) Hence when a proxy call to the implementation is made, variables such as *Owner* will be uninitialised (effectively set to their default value). This is equivalent to the owner being the 0x0 address. Without access to the implementation state variables, the proxy contract is rendered unusable.
+70. **Inadequate Proxy Implementation Preventing Contract Upgrades**: The *TokenImpl* smart contract requires Owner , name , symbol and decimals of *TokenImpl* to be set by the *TokenImpl* constructor. Consider two smart contracts, contract A and contract B . If contract A performs a delegatecall on contract B , the state/storage variables of contract B are not accessible by contract A . Therefore, when *TokenProxy* targets an implementation of *TokenImpl* and interacts with it via a *DELEGATECALL* , it will not be able to access any of the state variables of the *TokenImpl* contract. Instead, the *TokenProxy* will access its local storage, which does not contain the variables set in the constructor of the *TokenImpl* implementation. When the *TokenProxy* contract is constructed it will only initialize and set two storage slots: - The proxy admin address ( *\_setAdmin* internal function) - The token implementation address ( *\_setImplementation* private function) Hence when a proxy call to the implementation is made, variables such as *Owner* will be uninitialised (effectively set to their default value). This is equivalent to the owner being the 0x0 address. Without access to the implementation state variables, the proxy contract is rendered unusable.
 
     1.  Recommendation: 1) Set fixed constant parameters as Solidity constants. The solidity compiler replaces all occurrences of a constant in the code and thus does not reserve state for them. Thus if the correct getters exist for the ERC20 interface, the proxy contract doesn't need to initialise anything. 2) Create a constructor-like function that can only be called once within *TokenImpl* . This can be used to set the state variables as is currently done in the constructor, however if called by the proxy after deployment, the proxy will set its state variables. 3) Create getter and setter functions that can only be called by the owner . Note that this strategy allows the owner to change various parameters of the contract after deployment. 4) Predetermine the slots used by the required variables and set them in the constructor of the proxy. The storage slots used by a contract are deterministic and can be computed. Hence the variables Owner , name , symbol and decimals can be set directly by their slot in the proxy constructor.
 
     2.  Critical Risk severity finding from [Sigma Prime's Audit of InfiniGold](https://github.com/sigp/public-audits/raw/master/infinigold/review.pdf)
 
-71. **Blacklisting Bypass via *****transferFrom()***** Function**: The *transferFrom()* function in the *TokenImpl* contract does not verify that the sender (i.e. the from address) is not blacklisted. As such, it is possible for a user to allow an account to spend a certain allowance regardless of their blacklisting status.
+71. **Blacklisting Bypass via \*\*\***transferFrom()**\*** Function\**: The *transferFrom()* function in the *TokenImpl\* contract does not verify that the sender (i.e. the from address) is not blacklisted. As such, it is possible for a user to allow an account to spend a certain allowance regardless of their blacklisting status.
 
     1.  Recommendation: At present the function *transferFrom()* uses the *notBlacklisted(address)* modifier twice, on the msg.sender and to addresses. The *notBlacklisted(address)* modifier should be used a third time against the from address.
 
     2.  High Risk severity finding from [Sigma Prime's Audit of InfiniGold](https://github.com/sigp/public-audits/raw/master/infinigold/review.pdf)
 
-72. **Wrong Order of Operations Leads to Exponentiation of *****rewardPerTokenStored***: *rewardPerTokenStored* is mistakenly used in the numerator of a fraction instead of being added to the fraction. The result is that *rewardPerTokenStored* will grow exponentially thereby severely overstating each individual's rewards earned. Individuals will therefore either be able to withdraw more funds than should be allocated to them or they will not be able to withdraw their funds at all as the contract has insufficient SNX balance. This vulnerability makes the Unipool contract unusable.
+72. **Wrong Order of Operations Leads to Exponentiation of \*\*\***rewardPerTokenStored*\*\*: *rewardPerTokenStored* is mistakenly used in the numerator of a fraction instead of being added to the fraction. The result is that *rewardPerTokenStored\* will grow exponentially thereby severely overstating each individual's rewards earned. Individuals will therefore either be able to withdraw more funds than should be allocated to them or they will not be able to withdraw their funds at all as the contract has insufficient SNX balance. This vulnerability makes the Unipool contract unusable.
 
     1.  Recommendation: Adjust the function *rewardPerToken()* to represent the original functionality.
 
@@ -667,19 +669,19 @@
 
     2.  Medium Risk severity finding from [Sigma Prime's Audit of Synthetix Unipool](https://github.com/sigp/public-audits/blob/master/synthetix/unipool/review.pdf)
 
-76. **Malicious Users Can DOS/Hijack Requests From Chainlinked Contracts**: Malicious users can hijack or perform Denial of Service (DOS) attacks on requests of Chainlinked contracts by replicating or front-running legitimate requests. The Chainlinked (*Chainlinked.sol*) contract contains the *checkChainlinkFulfillment*() modifier. This modifier is demonstrated in the examples that come with the repository. In these examples this modifier is used within the functions which contracts implement that will be called by the Oracle when fulfilling requests. It requires that the caller of the function be the Oracle that corresponds to the request that is being fulfilled. Thus, requests from Chainlinked contracts are expected to only be fulfilled by the Oracle that they have requested. However, because a request can specify an arbitrary callback address, a malicious user can also place a request where the callback address is a target Chainlinked contract. If this malicious request gets fulfilled first (which can ask for incorrect or malicious results), the Oracle will call the legitimate contract and fulfil it with incorrect or malicious results. Because the known requests of a Chainlinked contract gets deleted, the legitimate request will fail. It could be such that the Oracle fulfils requests in the order in which they are received. In such cases, the malicious user could simply front-run the requests to be higher in the queue.
+76. **Malicious Users Can DOS/Hijack Requests From Chainlinked Contracts**: Malicious users can hijack or perform Denial of Service (DOS) attacks on requests of Chainlinked contracts by replicating or front-running legitimate requests. The Chainlinked (_Chainlinked.sol_) contract contains the *checkChainlinkFulfillment*() modifier. This modifier is demonstrated in the examples that come with the repository. In these examples this modifier is used within the functions which contracts implement that will be called by the Oracle when fulfilling requests. It requires that the caller of the function be the Oracle that corresponds to the request that is being fulfilled. Thus, requests from Chainlinked contracts are expected to only be fulfilled by the Oracle that they have requested. However, because a request can specify an arbitrary callback address, a malicious user can also place a request where the callback address is a target Chainlinked contract. If this malicious request gets fulfilled first (which can ask for incorrect or malicious results), the Oracle will call the legitimate contract and fulfil it with incorrect or malicious results. Because the known requests of a Chainlinked contract gets deleted, the legitimate request will fail. It could be such that the Oracle fulfils requests in the order in which they are received. In such cases, the malicious user could simply front-run the requests to be higher in the queue.
 
     1.  Recommendation: This issue arises due to the fact that any request can specify its own arbitrary callback address. A restrictive solution would be where callback addresses are localised to the requester themselves.
 
     2.  High Risk severity finding from [Sigma Prime's Audit of Chainlink](https://github.com/sigp/public-audits/blob/master/chainlink-1/review.pdf)
 
-77. **Lack of event emission after sensitive actions**: The *_getLatestFundingRate* function of the *FundingRateApplier* contract does not emit relevant events after executing the sensitive actions of setting the *fundingRate*, *updateTime* and *proposalTime*, and transferring the rewards.
+77. **Lack of event emission after sensitive actions**: The *\_getLatestFundingRate* function of the *FundingRateApplier* contract does not emit relevant events after executing the sensitive actions of setting the *fundingRate*, *updateTime* and *proposalTime*, and transferring the rewards.
 
     1.  Recommendation: Consider emitting events after sensitive changes take place, to facilitate tracking and notify off-chain clients following the contract's activity.
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of UMA Phase 4](https://blog.openzeppelin.com/uma-audit-phase-4/)
 
-78. **Functions with unexpected side-effects**: Some functions have side-effects. For example, the *_getLatestFundingRate* function of the *FundingRateApplier* contract might also update the funding rate and send rewards. The *getPrice* function of the OptimisticOracle contract might also settle a price request. These side-effect actions are not clear in the name of the functions and are thus unexpected, which could lead to mistakes when the code is modified by new developers not experienced in all the implementation details of the project.
+78. **Functions with unexpected side-effects**: Some functions have side-effects. For example, the *\_getLatestFundingRate* function of the *FundingRateApplier* contract might also update the funding rate and send rewards. The *getPrice* function of the OptimisticOracle contract might also settle a price request. These side-effect actions are not clear in the name of the functions and are thus unexpected, which could lead to mistakes when the code is modified by new developers not experienced in all the implementation details of the project.
 
     1.  Recommendation: Consider splitting these functions in separate getters and setters. Alternatively, consider renaming the functions to describe all the actions that they perform.
 
@@ -697,7 +699,7 @@
 
     2.  High Risk severity finding from [OpenZeppelin's Audit of Futureswap V2](https://blog.openzeppelin.com/futureswap-v2-audit/)
 
-81. **Not using upgrade safe contracts in *****FsToken***** inheritance**: The *FsToken* contract is intended to be an upgradeable contract, used behind a proxy (namely, the *FsTokenProxy* contract). However, the contracts *ERC20Snapshot*, *ERC20Mintable* and *ERC20Burnable* in the inheritance chain of FsToken are not imported from the upgrade safe library *@openzeppelin/contracts-ethereum-package* but instead from *@openzeppelin/contracts*.
+81. **Not using upgrade safe contracts in \*\*\***FsToken**\*** inheritance\**: The *FsToken* contract is intended to be an upgradeable contract, used behind a proxy (namely, the *FsTokenProxy* contract). However, the contracts *ERC20Snapshot*, *ERC20Mintable* and *ERC20Burnable* in the inheritance chain of FsToken are not imported from the upgrade safe library *@openzeppelin/contracts-ethereum-package* but instead from *@openzeppelin/contracts\*.
 
     1.  Recommendation: Use the upgrades safe library in this case will ensure the inheritance from Initializable and the other contracts is always linearized as expected by the compiler.
 
@@ -711,23 +713,23 @@
 
 83. **Adding new variables to multi-level inherited upgradeable contracts may break storage layout**: The Notional protocol uses the OpenZeppelin/SDK contracts to manage upgradeability in the system, which follows the unstructured storage pattern. When using this upgradeability approach, and when working with multi-level inheritance, if a new variable is introduced in a parent contract, that addition can potentially overwrite the beginning of the storage layout of the child contract, causing critical misbehaviors in the system.
 
-    1.  Recommendation: consider preventing these scenarios by defining a storage gap in each upgradeable parent contract at the end of all the storage variable definitions as follows: *uint256[50] __gap; // gap to reserve storage in the contract for future variable additions.* In such an implementation, the size of the gap would be intentionally decreased each time a new variable was introduced, thereby avoiding overwriting preexisting storage values.
+    1.  Recommendation: consider preventing these scenarios by defining a storage gap in each upgradeable parent contract at the end of all the storage variable definitions as follows: *uint256[50] \_\_gap; // gap to reserve storage in the contract for future variable additions.* In such an implementation, the size of the gap would be intentionally decreased each time a new variable was introduced, thereby avoiding overwriting preexisting storage values.
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of Notional Protocol](https://blog.openzeppelin.com/notional-audit/)
 
-84. **Unsafe division in *****rdivide***** and *****wdivide***** functions**: The function *rdivide* on line 227 and the function *wdivide* on line 230 of the *GlobalSettlement* contract, accept the divisor y as an input parameter. However, these functions do not check if the value of y is 0. If that is the case, the call will revert due to the division by zero error.
+84. **Unsafe division in \*\*\***rdivide**\*** and **\***wdivide**\*** functions\**: The function *rdivide* on line 227 and the function *wdivide* on line 230 of the *GlobalSettlement\* contract, accept the divisor y as an input parameter. However, these functions do not check if the value of y is 0. If that is the case, the call will revert due to the division by zero error.
 
     1.  Recommendation: consider adding a *require* statement in the functions to ensure *y > 0*, or consider using the *div* functions provided in OpenZeppelin's SafeMath libraries
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of GEB Protocol](https://blog.openzeppelin.com/geb-protocol-audit/)
 
-85. **Incorrect *****safeApprove***** usage**: The *safeApprove* function of the OpenZeppelin SafeERC20 library prevents changing an allowance between non-zero values to mitigate a possible front-running attack. Instead, the *safeIncreaseAllowance* and *safeDecreaseAllowance* functions should be used. However, the *UniERC20* library simply bypasses this restriction by first setting the allowance to zero. This reintroduces the front-running attack and undermines the value of the *safeApprove* function. Consider introducing an *increaseAllowance* function to handle this case.
+85. **Incorrect \*\*\***safeApprove**\*** usage\**: The *safeApprove* function of the OpenZeppelin SafeERC20 library prevents changing an allowance between non-zero values to mitigate a possible front-running attack. Instead, the *safeIncreaseAllowance* and *safeDecreaseAllowance* functions should be used. However, the *UniERC20* library simply bypasses this restriction by first setting the allowance to zero. This reintroduces the front-running attack and undermines the value of the *safeApprove* function. Consider introducing an *increaseAllowance\* function to handle this case.
 
     1.  Recommendation: *safeIncreaseAllowance* and *safeDecreaseAllowance* functions should be used
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of 1inch Exchange Audit](https://blog.openzeppelin.com/1inch-exchange-audit/)
 
-86. **ETH could get trapped in the protocol**: The Controller contract allows users to send arbitrary actions such as possible flash loans through the *_call* internal function. Among other features, it allows sending ETH with the action to then perform a call to a *CalleeInterface* type of contract. To do so, it saves the original *msg.value* sent with the operate function call in the *ethLeft* variable and it updates the remaining ETH left after each one of those calls to revert in case that it is not enough. Nevertheless, if the user sends more than the necessary ETH for the batch of actions, the remaining ETH (stored in the ethLeft variable after the last iteration) will not be returned to the user and will be locked in the contract due to the lack of a *withdrawEth* function.
+86. **ETH could get trapped in the protocol**: The Controller contract allows users to send arbitrary actions such as possible flash loans through the *\_call* internal function. Among other features, it allows sending ETH with the action to then perform a call to a *CalleeInterface* type of contract. To do so, it saves the original *msg.value* sent with the operate function call in the *ethLeft* variable and it updates the remaining ETH left after each one of those calls to revert in case that it is not enough. Nevertheless, if the user sends more than the necessary ETH for the batch of actions, the remaining ETH (stored in the ethLeft variable after the last iteration) will not be returned to the user and will be locked in the contract due to the lack of a *withdrawEth* function.
 
     1.  Recommendation: Consider either returning all the remaining ETH to the user or creating a function that allows the user to collect the remaining ETH after performing a Call action type, taking into account that sending ETH with a push method may trigger the fallback function on the caller's address.
 
@@ -757,9 +759,9 @@
 
     2.  High Risk severity finding from [OpenZeppelin's Audit of Audius](https://blog.openzeppelin.com/audius-contracts-audit/#high)
 
-91. **Inconsistently checking initialization**: When a contract is initialized, its *isInitialized* state variable is set to true. Since interacting with uninitialized contracts would cause problems, the *_requireIsInitialized* function is available to make this check. However, this check is not used consistently. For example, it is used in the *getVotingQuorum* function of the Governance contract, but it is not used in the *getRegistryAddress* function of the same contract. There is no obvious difference between the functions to explain this difference, and it could be misleading and cause uninitialized contracts to be called.
+91. **Inconsistently checking initialization**: When a contract is initialized, its *isInitialized* state variable is set to true. Since interacting with uninitialized contracts would cause problems, the *\_requireIsInitialized* function is available to make this check. However, this check is not used consistently. For example, it is used in the *getVotingQuorum* function of the Governance contract, but it is not used in the *getRegistryAddress* function of the same contract. There is no obvious difference between the functions to explain this difference, and it could be misleading and cause uninitialized contracts to be called.
 
-    1.  Recommendation: Consider calling *_requireIsInitialized* consistently in all the functions of the *InitializableV2* contracts. If there is a reason to not call it in some functions, consider documenting it. Alternatively, consider removing this check altogether and preparing a good deployment script that will ensure that all contracts are initialized in the same transaction that they are deployed. In this alternative, it would be required to check that contracts resulting from new proposals are also initialized before they are put in production.
+    1.  Recommendation: Consider calling *\_requireIsInitialized* consistently in all the functions of the *InitializableV2* contracts. If there is a reason to not call it in some functions, consider documenting it. Alternatively, consider removing this check altogether and preparing a good deployment script that will ensure that all contracts are initialized in the same transaction that they are deployed. In this alternative, it would be required to check that contracts resulting from new proposals are also initialized before they are put in production.
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of Audius](https://blog.openzeppelin.com/audius-contracts-audit/#medium)
 
@@ -781,9 +783,9 @@
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of Primitive](https://blog.openzeppelin.com/primitive-audit/)
 
-95. **ERC20 transfers can misbehave**: The *_transferFromERC20* function is used throughout* ACOToken.sol* to handle transferring funds into the contract from a user. It is called within mint, within *mintTo*, and within *_validateAndBurn*. In each case, the destination is the ACOToken contract. Such transfers may behave unexpectedly if the token contract charges fees. As an example, the popular USDT token does not presently charge any fees upon transfer, but it has the potential to do so. In this case the amount received would be less than the amount sent. Such tokens have the potential to lead to protocol insolvency when they are used to mint new ACOTokens. In the case of *_transferERC20*, similar issues can occur, and could cause users to receive less than expected when collateral is transferred or when exercise assets are transferred.
+95. **ERC20 transfers can misbehave**: The *\_transferFromERC20* function is used throughout* ACOToken.sol* to handle transferring funds into the contract from a user. It is called within mint, within *mintTo*, and within *\_validateAndBurn*. In each case, the destination is the ACOToken contract. Such transfers may behave unexpectedly if the token contract charges fees. As an example, the popular USDT token does not presently charge any fees upon transfer, but it has the potential to do so. In this case the amount received would be less than the amount sent. Such tokens have the potential to lead to protocol insolvency when they are used to mint new ACOTokens. In the case of *\_transferERC20*, similar issues can occur, and could cause users to receive less than expected when collateral is transferred or when exercise assets are transferred.
 
-    1.  Recommendation: Consider thoroughly vetting each token used within an ACO options pair, ensuring that failing *transferFrom* and *transfer* calls will cause reverts within *ACOToken.sol*. Additionally, consider implementing some sort of sanity check which enforces that the balance of the ACOToken contract increases by the desired amount when calling *_transferFromERC20*. 
+    1.  Recommendation: Consider thoroughly vetting each token used within an ACO options pair, ensuring that failing *transferFrom* and *transfer* calls will cause reverts within *ACOToken.sol*. Additionally, consider implementing some sort of sanity check which enforces that the balance of the ACOToken contract increases by the desired amount when calling *\_transferFromERC20*.
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of ACO Protocol](https://blog.openzeppelin.com/aco-protocol-audit/)
 
@@ -805,34 +807,35 @@
 
     2.  Critical Risk severity finding from [OpenZeppelin's Audit of MCDEX Mai Protocol](https://blog.openzeppelin.com/mcdex-mai-protocol-audit/)
 
-99. **Re-entrancy possibilities**: There are several examples of interactions preceding effects: 1) In the deposit function of the Collateral contract, collateral is retrieved before the user balance is updated and an event is emitted. 2) In the *_withdraw* function of the Collateral contract, collateral is sent before the event is emitted 3) The same pattern occurs in the *depositToInsuranceFund*, *depositEtherToInsuranceFund* and *withdrawFromInsuranceFund* functions of the Perpetual contract. It should be noted that even when a correctly implemented ERC20 contract is used for collateral, incoming and outgoing transfers could execute arbitrary code if the contract is also ERC777 compliant. These re-entrancy opportunities are unlikely to corrupt the internal state of the system, but they would affect the order and contents of emitted events, which could confuse external clients about the state of the system. 
+99. **Re-entrancy possibilities**: There are several examples of interactions preceding effects: 1) In the deposit function of the Collateral contract, collateral is retrieved before the user balance is updated and an event is emitted. 2) In the *\_withdraw* function of the Collateral contract, collateral is sent before the event is emitted 3) The same pattern occurs in the *depositToInsuranceFund*, *depositEtherToInsuranceFund* and *withdrawFromInsuranceFund* functions of the Perpetual contract. It should be noted that even when a correctly implemented ERC20 contract is used for collateral, incoming and outgoing transfers could execute arbitrary code if the contract is also ERC777 compliant. These re-entrancy opportunities are unlikely to corrupt the internal state of the system, but they would affect the order and contents of emitted events, which could confuse external clients about the state of the system.
 
     1.  Recommendation: Consider always following the "Check-Effects-Interactions" pattern or use *ReentrancyGuard* contract is now used to protect those functions
 
     2.  Medium Risk severity finding from [OpenZeppelin's Audit of MCDEX Mai Protocol](https://blog.openzeppelin.com/mcdex-mai-protocol-audit/)
 
-100. **Governance parameter changes should not be instant**: Many sensitive changes can be made by any account with the *WhitelistAdmin* role via the functions *setGovernanceParameter *within the *AMMGovernance* and *PerpetualGovernance* contracts. For example, the *WhitelistAdmin *can change the fee schedule, the initial and maintenance margin rates, or the lot size parameters, and these new parameters instantly take effect in the protocol with important effects. For example, raising the maintenance margin rate could cause *isSafe *to return False when it would have previously returned True. This would allow the user's position to be liquidated. By changing *tradingLotSize*, trades may revert when being matched, where they would not have before the change. These are only examples; the complexity of the protocol, combined with unpredictable market conditions and user actions means that many other negative effects likely exist as well.
+100.  **Governance parameter changes should not be instant**: Many sensitive changes can be made by any account with the *WhitelistAdmin* role via the functions *setGovernanceParameter *within the *AMMGovernance* and *PerpetualGovernance* contracts. For example, the *WhitelistAdmin *can change the fee schedule, the initial and maintenance margin rates, or the lot size parameters, and these new parameters instantly take effect in the protocol with important effects. For example, raising the maintenance margin rate could cause *isSafe *to return False when it would have previously returned True. This would allow the user's position to be liquidated. By changing *tradingLotSize*, trades may revert when being matched, where they would not have before the change. These are only examples; the complexity of the protocol, combined with unpredictable market conditions and user actions means that many other negative effects likely exist as well.
 
-    1.  Recommendation: Since these changes are occasionally needed, but can create risk for the users of the protocol, consider implementing a time-lock mechanism for such changes to take place. By having a delay between the signal of intent and the actual change, users will have time to remove their funds or close trades that would otherwise be at risk if the change happened instantly. 
+101.  Recommendation: Since these changes are occasionally needed, but can create risk for the users of the protocol, consider implementing a time-lock mechanism for such changes to take place. By having a delay between the signal of intent and the actual change, users will have time to remove their funds or close trades that would otherwise be at risk if the change happened instantly.
 
-    2.  Medium Risk severity finding from [OpenZeppelin's Audit of MCDEX Mai Protocol](https://blog.openzeppelin.com/mcdex-mai-protocol-audit/)
+102.  Medium Risk severity finding from [OpenZeppelin's Audit of MCDEX Mai Protocol](https://blog.openzeppelin.com/mcdex-mai-protocol-audit/)
 
-101. **Votes can be duplicated**: The Data Verification Mechanism uses a commit-reveal scheme to hide votes during the voting period. The intention is to prevent voters from simply voting with the majority. However, the current design allows voters to blindly copy each other's submissions, which undermines this goal. In particular, each commitment is a masked hash of the claimed price, but is not cryptographically tied to the voter. This means that anyone can copy the commitment of a target voter (for instance, someone with a large balance) and submit it as their own. When the target voter reveals their salt and price, the copycat can "reveal" the same values. Moreover, if another voter recognizes this has occurred during the commitment phase, they can also change their commitment to the same value, which may become an alternate Schelling point.
+103.  **Votes can be duplicated**: The Data Verification Mechanism uses a commit-reveal scheme to hide votes during the voting period. The intention is to prevent voters from simply voting with the majority. However, the current design allows voters to blindly copy each other's submissions, which undermines this goal. In particular, each commitment is a masked hash of the claimed price, but is not cryptographically tied to the voter. This means that anyone can copy the commitment of a target voter (for instance, someone with a large balance) and submit it as their own. When the target voter reveals their salt and price, the copycat can "reveal" the same values. Moreover, if another voter recognizes this has occurred during the commitment phase, they can also change their commitment to the same value, which may become an alternate Schelling point.
 
-    1.  Recommendation: Consider including the voter address within the commitment to prevent votes from being duplicated. Additionally, as a matter of good practice, consider including the relevant timestamp, price identifier and round ID as well to limit the applicability (and reusability) of a commitment.
+104.  Recommendation: Consider including the voter address within the commitment to prevent votes from being duplicated. Additionally, as a matter of good practice, consider including the relevant timestamp, price identifier and round ID as well to limit the applicability (and reusability) of a commitment.
 
-    2.  High Risk severity finding from [OpenZeppelin's Audit of UMA Phase 1](https://blog.openzeppelin.com/uma-audit-phase-1/)
+105.  High Risk severity finding from [OpenZeppelin's Audit of UMA Phase 1](https://blog.openzeppelin.com/uma-audit-phase-1/)
 
 ## Audit Findings 201
+
 _The numbering starts from 102 in the original article._
 
-1.  **Document potential edge cases for hook receiver contracts**: The functions *withdrawTokenAndCall*() and *withdrawTokenAndCallOnBehalf*() make a call to a hook contract designated by the owner of the withdrawing stealth address. There are very few constraints on the parameters to these calls in the Umbra contract itself. Anyone can force a call to a hook contract by transferring a small amount of tokens to an address that they control and withdrawing these tokens, passing the target address as the hook receiver. 
+1.  **Document potential edge cases for hook receiver contracts**: The functions *withdrawTokenAndCall*() and *withdrawTokenAndCallOnBehalf*() make a call to a hook contract designated by the owner of the withdrawing stealth address. There are very few constraints on the parameters to these calls in the Umbra contract itself. Anyone can force a call to a hook contract by transferring a small amount of tokens to an address that they control and withdrawing these tokens, passing the target address as the hook receiver.
 
     1.  Recommendation: Developers of these *UmbraHookReceiver* contracts should be sure to validate both the caller of the *tokensWithdrawn*() function and the function parameters.
 
     2.  [ConsenSys's Audit of Umbra](https://consensys.net/diligence/audits/2021/03/umbra-smart-contracts/#document-potential-edge-cases-for-hook-receiver-contracts)
 
-2.  **Document token behavior restrictions**: As with any protocol that interacts with arbitrary ERC20 tokens, it is important to clearly document which tokens are supported. Often this is best done by providing a specification for the behavior of the expected ERC20 tokens and only relaxing this specification after careful review of a particular class of tokens and their interactions with the protocol. 
+2.  **Document token behavior restrictions**: As with any protocol that interacts with arbitrary ERC20 tokens, it is important to clearly document which tokens are supported. Often this is best done by providing a specification for the behavior of the expected ERC20 tokens and only relaxing this specification after careful review of a particular class of tokens and their interactions with the protocol.
 
     1.  Recommendation: Known deviations from "normal" ERC20 behavior should be explicitly noted as NOT supported by the Umbra Protocol: 1) Deflationary or fee-on-transfer tokens: These are tokens in which the balance of the recipient of a transfer may not be increased by the amount of the transfer. There may also be some alternative mechanism by which balances are unexpectedly decreased. While these tokens can be successfully sent via the *sendToken()* function, the internal accounting of the Umbra contract will be out of sync with the balance as recorded in the token contract, resulting in loss of funds. 2) Inflationary tokens: The opposite of deflationary tokens. The Umbra contract provides no mechanism for claiming positive balance adjustments. 3) Rebasing tokens: A combination of the above cases, these are tokens in which an account's balance increases or decreases along with expansions or contractions in supply. The contract provides no mechanism to update its internal accounting in response to these unexpected balance adjustments, and funds may be lost as a result.
 
@@ -850,13 +853,13 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of DeFi Saver](https://consensys.net/diligence/audits/2021/03/defi-saver/#kyber-getrates-code-is-unclear)
 
-5.  **Return value is not used for *****TokenUtils.withdrawTokens***: The return value of *TokenUtils.withdrawTokens* which represents the actual amount of tokens that were transferred is never used throughout the repository. This might cause discrepancy in the case where the original value of *_amount* was *type(uint256).max*.
+5.  **Return value is not used for \*\*\***TokenUtils.withdrawTokens*\*\*: The return value of *TokenUtils.withdrawTokens* which represents the actual amount of tokens that were transferred is never used throughout the repository. This might cause discrepancy in the case where the original value of *\_amount* was *type(uint256).max\*.
 
     1.  Recommendation: The return value can be used to validate the withdrawal or used in the event emitted
 
     2.  [ConsenSys's Audit of DeFi Saver](https://consensys.net/diligence/audits/2021/03/defi-saver/#return-value-is-not-used-for-tokenutils-withdrawtokens)
 
-6.  **Missing access control for *****DefiSaverLogger.Log***: *DefiSaverLogger* is used as a logging aggregator within the entire dapp, but anyone can create logs.
+6.  **Missing access control for \*\*\***DefiSaverLogger.Log*\*\*: *DefiSaverLogger\* is used as a logging aggregator within the entire dapp, but anyone can create logs.
 
     1.  Recommendation: Add access control to all functions appropriately
 
@@ -874,25 +877,25 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of mstable-1.1](https://consensys.net/diligence/audits/2020/07/mstable-1.1/#discrepancy-between-code-and-comments)
 
-9.  **Remove unnecessary call to *****DAOfiV1Factory.formula*****()**: The *DAOfiV1Pair* functions *initialize*(), *getBaseOut*(), and *getQuoteOut*() all use the private function *_getFormula*(), which makes a call to the factory to retrieve the address of the *BancorFormula* contract. The formula address in the factory is set in the constructor and cannot be changed, so these calls can be replaced with an immutable value in the pair contract that is set in its constructor.
+9.  **Remove unnecessary call to \*\*\***DAOfiV1Factory.formula**\***()\**: The *DAOfiV1Pair* functions *initialize*(), *getBaseOut*(), and *getQuoteOut*() all use the private function *\_getFormula*(), which makes a call to the factory to retrieve the address of the *BancorFormula\* contract. The formula address in the factory is set in the constructor and cannot be changed, so these calls can be replaced with an immutable value in the pair contract that is set in its constructor.
 
     1.  Recommendation: Remove unnecessary calls
 
-    2.  [ConsenSys's Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#remove-unnecessary-call-to-daofiv1factory-formula) 
+    2.  [ConsenSys's Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#remove-unnecessary-call-to-daofiv1factory-formula)
 
 10. **Deeper validation of curve math**: Increased testing of edge cases in complex mathematical operations could have identified at least one issue raised in this report. Additional unit tests are recommended, as well as fuzzing or property-based testing of curve-related operations. Improperly validated interactions with the *BancorFormula* contract are seen to fail in unanticipated and potentially dangerous ways, so care should be taken to validate inputs and prevent pathological curve parameters.
 
     1.  Recommendation: More validation of mathematical operations
 
-    2.  [ConsenSys's Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#deeper-validation-of-curve-math) 
+    2.  [ConsenSys's Audit of DAOfi](https://consensys.net/diligence/audits/2021/02/daofi/#deeper-validation-of-curve-math)
 
-11. ***GovernorAlpha***** proposals may be canceled by the proposer, even after they have been accepted and queued**: *GovernorAlpha* allows proposals to be canceled via cancel. A proposer may cancel proposals in any of these states: Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired. 
+11. **\*GovernorAlpha\*\*\*** proposals may be canceled by the proposer, even after they have been accepted and queued\**: *GovernorAlpha\* allows proposals to be canceled via cancel. A proposer may cancel proposals in any of these states: Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired.
 
     1.  Recommendation: Prevent proposals from being canceled unless they are in the Pending or Active states.
 
-    2.  [ConsenSys's Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#governoralpha-proposals-may-be-canceled-by-the-proposer-even-after-they-have-been-accepted-and-queued) 
+    2.  [ConsenSys's Audit of Fei Protocol](https://consensys.net/diligence/audits/2021/01/fei-protocol/#governoralpha-proposals-may-be-canceled-by-the-proposer-even-after-they-have-been-accepted-and-queued)
 
-12. **Require a delay period before granting *****KYC_ADMIN_ROLE*****  Acknowledged**: The KYC Admin has the ability to freeze the funds of any user at any time by revoking the *KYC_MEMBER_ROLE*. The trust requirements from users can be decreased slightly by implementing a delay on granting this ability to new addresses. While the management of private keys and admin access is outside the scope of this review, the addition of a time delay can also help protect the development team and the system itself in the event of private key compromise.
+12. **Require a delay period before granting \*\*\***KYC_ADMIN_ROLE**\***  Acknowledged\**: The KYC Admin has the ability to freeze the funds of any user at any time by revoking the *KYC_MEMBER_ROLE\*. The trust requirements from users can be decreased slightly by implementing a delay on granting this ability to new addresses. While the management of private keys and admin access is outside the scope of this review, the addition of a time delay can also help protect the development team and the system itself in the event of private key compromise.
 
     1.  Recommendation: Use a *TimelockController* as the *KYC_DEFAULT_ADMIN* of the eRLC contract
 
@@ -916,9 +919,9 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of 1inch Liquidity Protocol](https://consensys.net/diligence/audits/2020/12/1inch-liquidity-protocol/#use-of-hardcoded-gas-limits-can-be-problematic)
 
-16. **Anyone can steal all the funds that belong to *****ReferralFeeReceiver***: The *ReferralFeeReceiver* receives pool shares when users *swap()* tokens in the pool. A *ReferralFeeReceiver* may be used with multiple pools and, therefore, be a lucrative target as it is holding pool shares. Any token or ETH that belongs to the *ReferralFeeReceiver* is at risk and can be drained by any user by providing a custom mooniswap pool contract that references existing token holdings. It should be noted that none of the functions in *ReferralFeeReceiver* verify that the user-provided mooniswap pool address was actually deployed by the linked MooniswapFactory.
+16. **Anyone can steal all the funds that belong to \*\*\***ReferralFeeReceiver*\*\*: The *ReferralFeeReceiver* receives pool shares when users *swap()* tokens in the pool. A *ReferralFeeReceiver* may be used with multiple pools and, therefore, be a lucrative target as it is holding pool shares. Any token or ETH that belongs to the *ReferralFeeReceiver* is at risk and can be drained by any user by providing a custom mooniswap pool contract that references existing token holdings. It should be noted that none of the functions in *ReferralFeeReceiver\* verify that the user-provided mooniswap pool address was actually deployed by the linked MooniswapFactory.
 
-    1.  Recommendation: Enforce that the user-provided mooniswap contract was actually deployed by the linked factory. Other contracts cannot be trusted. Consider implementing token sorting and de-duplication (*tokenA!=tokenB*) in the pool contract constructor as well. Consider employing a reentrancy guard to safeguard the contract from reentrancy attacks. Improve testing. The methods mentioned here are not covered at all. Improve documentation and provide a specification that outlines how this contract is supposed to be used.
+    1.  Recommendation: Enforce that the user-provided mooniswap contract was actually deployed by the linked factory. Other contracts cannot be trusted. Consider implementing token sorting and de-duplication (_tokenA!=tokenB_) in the pool contract constructor as well. Consider employing a reentrancy guard to safeguard the contract from reentrancy attacks. Improve testing. The methods mentioned here are not covered at all. Improve documentation and provide a specification that outlines how this contract is supposed to be used.
 
     2.  Critical finding in [ConsenSys's Audit of 1inch Liquidity Protocol](https://consensys.net/diligence/audits/2020/12/1inch-liquidity-protocol/#out-of-scope-referralfeereceiver-anyone-can-steal-all-the-funds-that-belong-to-referralfeereceiver)
 
@@ -958,7 +961,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of Growth DeFi](https://consensys.net/diligence/audits/2020/12/growth-defi-v1/#prevent-contracts-from-being-used-before-they-are-entirely-initialized)
 
-23. **Potential resource exhaustion by external calls performed within an unbounded loop**: *DydxFlashLoanAbstraction*.*_requestFlashLoan* performs external calls in a potentially-unbounded loop. Depending on changes made to DyDx's *SoloMargin*, this may render this flash loan provider prohibitively expensive. In the worst case, changes to *SoloMargin* could make it impossible to execute this code due to the block gas limit.
+23. **Potential resource exhaustion by external calls performed within an unbounded loop**: *DydxFlashLoanAbstraction*.*\_requestFlashLoan* performs external calls in a potentially-unbounded loop. Depending on changes made to DyDx's *SoloMargin*, this may render this flash loan provider prohibitively expensive. In the worst case, changes to *SoloMargin* could make it impossible to execute this code due to the block gas limit.
 
     1.  Recommendation: Reconsider or bound the loop
 
@@ -966,11 +969,11 @@ _The numbering starts from 102 in the original article._
 
 24. **Owners can never be removed**: The intention of *setOwners*() is to replace the current set of owners with a new set of owners. However, the *isOwner* mapping is never updated, which means any address that was ever considered an owner is permanently considered an owner for purposes of signing transactions.
 
-    1.  Recommendation: In *setOwners_*(), before adding new owners, loop through the current set of owners and clear their *isOwner* booleans
+    1.  Recommendation: In *setOwners\_*(), before adding new owners, loop through the current set of owners and clear their *isOwner* booleans
 
     2.  Critical finding in [ConsenSys's Audit of Paxos](https://consensys.net/diligence/audits/2020/11/paxos/#owners-can-never-be-removed)
 
-25. **Potential manipulation of stable interest rates using flash loans**: Flash loans allow users to borrow large amounts of liquidity from the protocol. It is possible to adjust the stable rate up or down by momentarily removing or adding large amounts of liquidity to reserves. 
+25. **Potential manipulation of stable interest rates using flash loans**: Flash loans allow users to borrow large amounts of liquidity from the protocol. It is possible to adjust the stable rate up or down by momentarily removing or adding large amounts of liquidity to reserves.
 
     1.  Recommendation: This type of manipulation is difficult to prevent especially when flash loans are available. Aave should monitor the protocol at all times to make sure that interest rates are being rebalanced to sane values.
 
@@ -982,7 +985,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of Aave Governance DAO](https://consensys.net/diligence/audits/2020/08/aave-governance-dao/#only-whitelist-validated-assets)
 
-27. **Underflow if *****TOKEN_DECIMALS***** are greater than 18**: In *latestAnswer*(), the assumption is made that *TOKEN_DECIMALS* is less than 18.
+27. **Underflow if \*\*\***TOKEN_DECIMALS**\*** are greater than 18\**: In *latestAnswer*(), the assumption is made that *TOKEN_DECIMALS\* is less than 18.
 
     1.  Recommendation: Add a simple check to the constructor to ensure the added token has 18 decimals or less
 
@@ -992,11 +995,11 @@ _The numbering starts from 102 in the original article._
 
     1.  Recommendation: Review Chainlink's performance at times of price volatility
 
-    2.  [ConsenSys's Audit of Aave CPM Price Provider](https://consensys.net/diligence/audits/2020/05/aave-cpm-price-provider/#review-chainlink-s-performance-at-times-of-price-volatility) 
+    2.  [ConsenSys's Audit of Aave CPM Price Provider](https://consensys.net/diligence/audits/2020/05/aave-cpm-price-provider/#review-chainlink-s-performance-at-times-of-price-volatility)
 
-29. **Consider an iterative approach to launching. Be aware of and prepare for worst-case scenarios**: The system has many components with complex functionality and no apparent upgrade path. 
+29. **Consider an iterative approach to launching. Be aware of and prepare for worst-case scenarios**: The system has many components with complex functionality and no apparent upgrade path.
 
-    1.  Recommendation: We recommend identifying which components are crucial for a minimum viable system, then focusing efforts on ensuring the security of those components first, and then moving on to the others. During the early life of the system, have a method for pausing and upgrading the system. 
+    1.  Recommendation: We recommend identifying which components are crucial for a minimum viable system, then focusing efforts on ensuring the security of those components first, and then moving on to the others. During the early life of the system, have a method for pausing and upgrading the system.
 
     2.  [ConsenSys's Audit of Lien Protocol](https://consensys.net/diligence/audits/2020/05/lien-protocol/#consider-an-iterative-approach-to-launching)
 
@@ -1006,9 +1009,9 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of Balancer Finance](https://consensys.net/diligence/audits/2020/05/balancer-finance/#use-of-modifiers-for-repeated-checks)
 
-31. **Switch modifier order**: *BPool* functions often use modifiers in the following order: *_logs_*, *_lock_*. Because *_lock_* is a reentrancy guard, it should take precedence over *_logs_.*
+31. **Switch modifier order**: *BPool* functions often use modifiers in the following order: **logs**, **lock**. Because **lock** is a reentrancy guard, it should take precedence over \*_logs_.\*
 
-    1.  Recommendation: Place *_lock_* before other modifiers; ensuring it is the very first and very last thing to run when a function is called.
+    1.  Recommendation: Place **lock** before other modifiers; ensuring it is the very first and very last thing to run when a function is called.
 
     2.  [ConsenSys's Audit of Balancer Finance](https://consensys.net/diligence/audits/2020/05/balancer-finance/#switch-modifier-order-in-bpool)
 
@@ -1018,15 +1021,15 @@ _The numbering starts from 102 in the original article._
 
     2.  [ConsenSys's Audit of MCDEX Mai Protocol V2](https://consensys.net/diligence/audits/2020/05/mcdex-mai-protocol-v2/#address-codebase-fragility)
 
-33. **Reentrancy could lead to incorrect order of emitted events**: The order of operations in the _*moveTokensAndETHfromAdjustment* function in the *BorrowOperations* contract may allow an attacker to cause events to be emitted out of order. In the event that the borrower is a contract, this could trigger a callback into *BorrowerOperations*, executing the _ *adjustTrove* flow above again. As the *_moveTokensAndETHfromAdjustment* call is the final operation in the function the state of the system on-chain cannot be manipulated. However, there are events that are emitted after this call. In the event of a reentrant call, these events would be emitted in the incorrect order. The event for the second operation i s emitted first, followed by the event for the first operation. Any off-chain monitoring tools may now have an inconsistent view of on-chain state.
+33. **Reentrancy could lead to incorrect order of emitted events**: The order of operations in the \**moveTokensAndETHfromAdjustment* function in the *BorrowOperations* contract may allow an attacker to cause events to be emitted out of order. In the event that the borrower is a contract, this could trigger a callback into *BorrowerOperations*, executing the \* *adjustTrove* flow above again. As the *\_moveTokensAndETHfromAdjustment* call is the final operation in the function the state of the system on-chain cannot be manipulated. However, there are events that are emitted after this call. In the event of a reentrant call, these events would be emitted in the incorrect order. The event for the second operation i s emitted first, followed by the event for the first operation. Any off-chain monitoring tools may now have an inconsistent view of on-chain state.
 
-    1.  Recommendation: Apply the checks-effects-interactions pattern and move the event emissions above the call to _ *moveTokensAndETHfromAdjustment* to avoid the potential reentrancy.
+    1.  Recommendation: Apply the checks-effects-interactions pattern and move the event emissions above the call to \_ *moveTokensAndETHfromAdjustment* to avoid the potential reentrancy.
 
     2.  [ToB's Audit of Liquidity](https://github.com/trailofbits/publications/blob/master/reviews/Liquity.pdf)
 
-34. **Variable shadowing from OUSD to ERC20**: OUSD inherits from ERC20, but redefines the _ *allowances* and _ *totalSupply* state variables. As a result, access to these variables can lead to returning different values.
+34. **Variable shadowing from OUSD to ERC20**: OUSD inherits from ERC20, but redefines the \* *allowances* and \* *totalSupply* state variables. As a result, access to these variables can lead to returning different values.
 
-    1.  Recommendation: Remove the shadowed variables (_ *allowances* and _ *totalSupply*) in OUSD.
+    1.  Recommendation: Remove the shadowed variables (\* *allowances* and \* *totalSupply*) in OUSD.
 
     2.  [ToB's Audit of Origin Dollar](https://github.com/trailofbits/publications/blob/master/reviews/OriginDollar.pdf)
 
@@ -1052,13 +1055,13 @@ _The numbering starts from 102 in the original article._
 
     1.  Recommendation: Rewrite the authorization system to allow only certain addresses to access certain functions
 
-    2.  [ToB's Audit of Yield Protocol](https://github.com/trailofbits/publications/blob/master/reviews/YieldProtocol.pdf) 
+    2.  [ToB's Audit of Yield Protocol](https://github.com/trailofbits/publications/blob/master/reviews/YieldProtocol.pdf)
 
 39. **Lack of validation when setting the maturity value: **When a *fyDAI* contract is deployed, one of the deployment parameters is a maturity date, passed as a Unix timestamp. This is the date at which point *fyDAI* tokens can be redeemed for the underlying Dai. Currently, the contract constructor performs no validation on this timestamp to ensure it is within an acceptable range. As a result, it is possible to mistakenly deploy a *YDai* contract that has a maturity date in the past or many years in the future, which may not be immediately noticed.
 
     1.  Recommendation: Short term, add checks to the *YDai* contract constructor to ensure maturity timestamps fall within an acceptable range. This will prevent maturity dates from being mistakenly set in the past or too far in the future. Long term, always perform validation of parameters passed to contract constructors. This will help detect and prevent errors during deployment.
 
-    2.  [ToB's Audit of Yield Protocol](https://github.com/trailofbits/publications/blob/master/reviews/YieldProtocol.pdf) 
+    2.  [ToB's Audit of Yield Protocol](https://github.com/trailofbits/publications/blob/master/reviews/YieldProtocol.pdf)
 
 40. **Delegates can be added or removed repeatedly to bloat logs**: Several contracts in the Yield Protocol system inherit the Delegable contract. This contract allows users to delegate the ability to perform certain operations on their behalf to other addresses. When a user adds or removes a delegate, a corresponding event is emitted to log this operation. However, there is no check to prevent a user from repeatedly adding or removing a delegation that is already enabled or revoked, which could allow redundant events to be emitted repeatedly.
 
@@ -1068,35 +1071,35 @@ _The numbering starts from 102 in the original article._
 
 41. **Lack of events for critical operations**: Several critical operations do not trigger events, which will make it difficult to review the correct behavior of the contracts once deployed. Users and blockchain monitoring systems will not be able to easily detect suspicious behaviors without events.
 
-    1.  Recommendation: Short term, add events where appropriate for all critical operations. Long term, consider using a blockchain monitoring system to track any suspicious behavior in the contracts. 
+    1.  Recommendation: Short term, add events where appropriate for all critical operations. Long term, consider using a blockchain monitoring system to track any suspicious behavior in the contracts.
 
     2.  [ToB's Audit of 0x Protocol](https://github.com/trailofbits/publications/blob/master/reviews/0x-protocol.pdf)
 
-42. ***_assertStakingPoolExists***** never returns true**: The *_assertStakingPoolExists* should return a bool to determine if the staking pool exists or not; however, it only returns false or reverts. The *_assertStakingPoolExists* function checks that a staking pool exists given a pool id parameter. However, this function does not use a return statement and therefore, it will always return false or revert.
+42. **\*\_assertStakingPoolExists\*\*\*** never returns true\*_: The _\_assertStakingPoolExists* should return a bool to determine if the staking pool exists or not; however, it only returns false or reverts. The *\_assertStakingPoolExists\* function checks that a staking pool exists given a pool id parameter. However, this function does not use a return statement and therefore, it will always return false or revert.
 
     1.  Recommendation: Add a return statement or remove the return type. Properly adjust the documentation, if needed.
 
     2.  [ToB's Audit of 0x Protocol](https://github.com/trailofbits/publications/blob/master/reviews/0x-protocol.pdf)
 
-43. **_min* and _max* have unorthodox semantics**: Throughout the Curve contract, *_minTargetAmount* and *_maxOriginAmount* are used as open ranges (i.e., ranges that exclude the value itself). This contravenes the standard meanings of the terms "minimum" and "maximum," which are generally used to describe closed ranges.
+43. **\_min* and \_max* have unorthodox semantics**: Throughout the Curve contract, *\_minTargetAmount* and *\_maxOriginAmount* are used as open ranges (i.e., ranges that exclude the value itself). This contravenes the standard meanings of the terms "minimum" and "maximum," which are generally used to describe closed ranges.
 
     1.  Recommendation: Short term, unless they are intended to be strict, make the inequalities in the require statements non-strict. Alternatively, consider refactoring the variables or providing additional documentation to convey that they are meant to be exclusive bounds. Long term, ensure that mathematical terms such as "minimum," "at least," and "at most" are used in the typical way---that is, to describe values inclusive of minimums or maximums (as relevant).
 
     2.  [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-44. ***CurveFactory.newCurve***** returns existing curves without provided arguments**: *CurveFactory.newCurve* takes values and creates a Curve contract instance for each *_baseCurrency* and *_quoteCurrency* pair, populating the Curve with provided weights and assimilator contract references. However, if the pair already exists, the existing Curve will be returned without any indication that it is not a newly created Curve with the provided weights. If an operator attempts to create a new Curve for a base-and-quote-currency pair that already exists, *CurveFactory* will return the existing Curve instance regardless of whether other creation parameters differ. A naive operator may overlook this issue.
+44. **\*CurveFactory.newCurve\*\*\*** returns existing curves without provided arguments\**: *CurveFactory.newCurve* takes values and creates a Curve contract instance for each *\_baseCurrency* and *\_quoteCurrency* pair, populating the Curve with provided weights and assimilator contract references. However, if the pair already exists, the existing Curve will be returned without any indication that it is not a newly created Curve with the provided weights. If an operator attempts to create a new Curve for a base-and-quote-currency pair that already exists, *CurveFactory\* will return the existing Curve instance regardless of whether other creation parameters differ. A naive operator may overlook this issue.
 
     1.  Recommendation: Consider rewriting *newCurve* such that it reverts in the event that a base-and-quote-currency pair already exists. A view function can be used to check for and retrieve existing Curves without any gas payment prior to an attempt at Curve creation.
 
     2.  [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-45. **Missing zero-address checks in *****Curve.transferOwnership***** and *****Router.constructor***: Like other similar functions, *Curve._transfer* and *Orchestrator.includeAsset* perform zero-address checks. However, *Curve.transferOwnership* and the Router constructor do not. This may make sense for *Curve.transferOwnership*, because without zero-address checks, the function may serve as a means of burning ownership. However, popular contracts that define similar functions often consider this case, such as OpenZeppelin's *Ownable* contracts. Conversely, a zero-address check should be added to the Router constructor to prevent the deployment of an invalid Router, which would revert upon a call to the zero address.
+45. **Missing zero-address checks in \*\*\***Curve.transferOwnership**\*** and **\***Router.constructor*\*\*: Like other similar functions, *Curve.\_transfer* and *Orchestrator.includeAsset* perform zero-address checks. However, *Curve.transferOwnership* and the Router constructor do not. This may make sense for *Curve.transferOwnership*, because without zero-address checks, the function may serve as a means of burning ownership. However, popular contracts that define similar functions often consider this case, such as OpenZeppelin's *Ownable\* contracts. Conversely, a zero-address check should be added to the Router constructor to prevent the deployment of an invalid Router, which would revert upon a call to the zero address.
 
     1.  Recommendation: Short term, consider adding zero-address checks to the Router's constructor and Curve's *transferOwnership* function to prevent operator errors. Long term, review state variables which referencing contracts to ensure that the code that sets the state variables performs zero-address checks where necessary
 
     2.  [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-46. ***safeApprove***** does not check return values for approve call**: Although the Router contract uses OpenZeppelin's *SafeERC20* library to perform safe calls to ERC20's approve function, the Orchestrator library defines its own *safeApprove* function. This function checks that a call to approve was successful but does not check returndata to verify whether the call returned true. In contrast, OpenZeppelin's *safeApprove* function checks return values appropriately. This issue may result in uncaught approve errors in successful Curve deployments, causing undefined behavior.
+46. **\*safeApprove\*\*\*** does not check return values for approve call\**: Although the Router contract uses OpenZeppelin's *SafeERC20* library to perform safe calls to ERC20's approve function, the Orchestrator library defines its own *safeApprove* function. This function checks that a call to approve was successful but does not check returndata to verify whether the call returned true. In contrast, OpenZeppelin's *safeApprove\* function checks return values appropriately. This issue may result in uncaught approve errors in successful Curve deployments, causing undefined behavior.
 
     1.  Recommendation: Short term, leverage OpenZeppelin's *safeApprove* function wherever possible. Long term, ensure that all low-level calls have accompanying contract existence checks and return value checks where appropriate.
 
@@ -1108,19 +1111,19 @@ _The numbering starts from 102 in the original article._
 
     2.  [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-48. **Insufficient use of *****SafeMath***: *CurveMath.calculateTrade* is used to compute the output amount for a trade. However, although *SafeMath* is used throughout the codebase to prevent underflows/overflows, it is not used in this calculation. Although we could not prove that the lack of *SafeMath* would cause an arithmetic issue in practice, all such calculations would benefit from the use of *SafeMath*.
+48. **Insufficient use of \*\*\***SafeMath*\*\*: *CurveMath.calculateTrade* is used to compute the output amount for a trade. However, although *SafeMath* is used throughout the codebase to prevent underflows/overflows, it is not used in this calculation. Although we could not prove that the lack of *SafeMath* would cause an arithmetic issue in practice, all such calculations would benefit from the use of *SafeMath\*.
 
     1.  Recommendation: Review all critical arithmetic to ensure that it accounts for underflows, overflows, and the loss of precision. Consider using *SafeMath* and the safe functions of *ABDKMath64x64* where possible to prevent underflows and overflows.
 
     2.  [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-49. ***setFrozen***** can be front-run to deny deposits/swaps**: Currently, a Curve contract owner can use the *setFrozen* function to set the contract into a state that will block swaps and deposits. A contract owner could leverage this process to front-run transactions and freeze contracts before certain deposits or swaps are made; the contract owner could then unfreeze them at a later time.
+49. **\*setFrozen\*\*\*** can be front-run to deny deposits/swaps\**: Currently, a Curve contract owner can use the *setFrozen\* function to set the contract into a state that will block swaps and deposits. A contract owner could leverage this process to front-run transactions and freeze contracts before certain deposits or swaps are made; the contract owner could then unfreeze them at a later time.
 
     1.  Recommendation: Short term, consider rewriting *setFrozen* such that any contract freeze will not last long enough for a malicious user to easily execute an attack. Alternatively, depending on the intended use of this function, consider implementing permanent freezes.
 
     2.  [ToB's Audit of DFX Finance](https://github.com/dfx-finance/protocol/blob/main/audits/2021-05-03-Trail_of_Bits.pdf)
 
-50. **Account creation spam: **Hermez has a limit of *2**MAX_NLEVELS* accounts. There is no fee on account creation, so an attacker can spam the network with account creation to fill the tree. If *MAX_NLEVELS* is below 32, an attacker can quickly reach the account limit. If *MAX_NLEVELS* is above or equal to 32, the time required to fill the tree will depend on the number of transactions accepted per second, but will take at least a couple of months. Ethereum miners do not have to pay for account creation. Therefore, an Ethereum miner can spam the network with account creation by sending L1 user transactions. 
+50. **Account creation spam: **Hermez has a limit of *2\*\*MAX_NLEVELS* accounts. There is no fee on account creation, so an attacker can spam the network with account creation to fill the tree. If *MAX_NLEVELS* is below 32, an attacker can quickly reach the account limit. If *MAX_NLEVELS* is above or equal to 32, the time required to fill the tree will depend on the number of transactions accepted per second, but will take at least a couple of months. Ethereum miners do not have to pay for account creation. Therefore, an Ethereum miner can spam the network with account creation by sending L1 user transactions.
 
     1.  Recommendation: Short term, add a fee for account creation or ensure *MAX_NLEVELS* is at least 32. Also, monitor account creation and alert the community if a malicious coordinator spams the system. This will prevent an attacker from spamming the system to prevent new accounts from being created. Long term, when designing spam mitigation, consider that L1 gas cost can be avoided by Ethereum miners.
 
@@ -1132,13 +1135,13 @@ _The numbering starts from 102 in the original article._
 
     2.  [ToB's Audit of Hermez Network](https://github.com/trailofbits/publications/blob/master/reviews/hermez.pdf)
 
-52. ***cancelTransaction***** can be called on non-queued transaction**: Without a transaction existence check in *cancelTransaction*, an attacker can confuse monitoring systems. *cancelTransaction* emits an event without checking that the transaction to be canceled exists. This allows a malicious admin to confuse monitoring systems by generating malicious events.
+52. **\*cancelTransaction\*\*\*** can be called on non-queued transaction\**: Without a transaction existence check in *cancelTransaction*, an attacker can confuse monitoring systems. *cancelTransaction\* emits an event without checking that the transaction to be canceled exists. This allows a malicious admin to confuse monitoring systems by generating malicious events.
 
     1.  Recommendation: Short term, check that the transaction to be canceled exists in *cancelTransaction*. This will ensure that monitoring tools can rely on emitted events. Long term, write a specification of each function and thoroughly test it with unit tests and fuzzing. Use symbolic execution for arithmetic invariants.
 
     2.  [ToB's Audit of Hermez Network](https://github.com/trailofbits/publications/blob/master/reviews/hermez.pdf)
 
-53. **Contracts used as dependencies do not track upstream changes**: Third-party contracts like *_concatStorage* are pasted into the Hermez repository. Moreover, the code documentation does not specify the exact revision used, or if it is modified. This makes updates and security fixes on these dependencies unreliable since they must be updated manually. *_concatStorage* is borrowed from the solidity-bytes-utils library, which provides helper functions for byte-related operations. Recently, a critical vulnerability was discovered in the library's slice function which allows arbitrary writes for user-supplied inputs. 
+53. **Contracts used as dependencies do not track upstream changes**: Third-party contracts like *\_concatStorage* are pasted into the Hermez repository. Moreover, the code documentation does not specify the exact revision used, or if it is modified. This makes updates and security fixes on these dependencies unreliable since they must be updated manually. *\_concatStorage* is borrowed from the solidity-bytes-utils library, which provides helper functions for byte-related operations. Recently, a critical vulnerability was discovered in the library's slice function which allows arbitrary writes for user-supplied inputs.
 
     1.  Recommendation: Short term, review the codebase and document each dependency's source and version. Include the third-party sources as submodules in your Git repository so internal path consistency can be maintained and dependencies are updated periodically. Long term, identify the areas in the code that are relying on external libraries and use an Ethereum development environment and NPM to manage packages as part of your project.
 
@@ -1168,7 +1171,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [ToB's Audit of Advanced Blockchains](https://github.com/trailofbits/publications/blob/master/reviews/AdvancedBlockchain.pdf)
 
-58. **Flash loan rate lacks bounds and can be set arbitrarily**: There are no lower or upper bounds on the flash loan rate implemented in the contract. The Blacksmith team could therefore set an arbitrarily high flash loan rate to secure higher fees. The Blacksmith team sets the *_flashLoanRate* when the Vault is first initialized. The *blackSmithTeam* address can then update this value by calling *updateFlashloanRate*. However, because there is no check on either setter function, the flash loan rate can be set arbitrarily. A very high rate could enable the Blacksmith team to steal vault deposits.
+58. **Flash loan rate lacks bounds and can be set arbitrarily**: There are no lower or upper bounds on the flash loan rate implemented in the contract. The Blacksmith team could therefore set an arbitrarily high flash loan rate to secure higher fees. The Blacksmith team sets the *\_flashLoanRate* when the Vault is first initialized. The *blackSmithTeam* address can then update this value by calling *updateFlashloanRate*. However, because there is no check on either setter function, the flash loan rate can be set arbitrarily. A very high rate could enable the Blacksmith team to steal vault deposits.
 
     1.  Recommendation: Short term, introduce lower and upper bounds for all configurable parameters in the system to limit privileged users' abilities. Long term, identify all incoming parameters in the system as well as the financial implications of large and small corner-case values. Additionally, use Echidna or Manticore to ensure that system invariants hold.
 
@@ -1198,7 +1201,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [ToB's Audit of Advanced Blockchains](https://github.com/trailofbits/publications/blob/master/reviews/AdvancedBlockchain.pdf)
 
-63. **ABIEncoderV2 is not production-ready**: The contracts use the new Solidity ABI encoder, *ABIEncoderV2*. This experimental encoder is not ready for production. More than 3% of all GitHub issues for the Solidity compiler are related to experimental features, primarily *ABIEncoderV2*. Several issues and bug reports are still open and unresolved. *ABIEncoderV2* has been associated with more than [20 high-severity bugs](https://github.com/ethereum/solidity/issues?q=is:issue+abiencoderv2+label:%22bug+:bug:%22+sort:created-desc), some of which are so recent that they have not yet been included in a Solidity release. For example, in March 2019 a [severe bug](https://blog.ethereum.org/2019/03/26/solidity-optimizer-and-abiencoderv2-bug/) introduced in Solidity 0.5.5 was found in the encoder. 
+63. **ABIEncoderV2 is not production-ready**: The contracts use the new Solidity ABI encoder, *ABIEncoderV2*. This experimental encoder is not ready for production. More than 3% of all GitHub issues for the Solidity compiler are related to experimental features, primarily *ABIEncoderV2*. Several issues and bug reports are still open and unresolved. *ABIEncoderV2* has been associated with more than [20 high-severity bugs](https://github.com/ethereum/solidity/issues?q=is:issue+abiencoderv2+label:%22bug+:bug:%22+sort:created-desc), some of which are so recent that they have not yet been included in a Solidity release. For example, in March 2019 a [severe bug](https://blog.ethereum.org/2019/03/26/solidity-optimizer-and-abiencoderv2-bug/) introduced in Solidity 0.5.5 was found in the encoder.
 
     1.  Recommendation: Short term, use neither *ABIEncoderV2* nor any other experimental Solidity feature. Refactor the code such that structs do not need to be passed to or returned from functions. Long term, integrate static analysis tools like Slither into your CI pipeline to detect unsafe pragmas.
 
@@ -1216,9 +1219,9 @@ _The numbering starts from 102 in the original article._
 
     2.  [ToB's Audit of dForce Lending](https://github.com/dforce-network/documents/blob/master/audit_report/Lending/dForceLending-Audit-Report-TrailofBits-Mar-2021.pdf)
 
-66. **Redundant and Unused Code**: The *_recordLoanClosure()* function returns a boolean ( *loanClosed* ) which is never used by the calling function (see *_closeLoan*() , line [312]). Furthermore, since the *_recordLoanClosure*() function is only called via the *_closeLoan*() function, this means that *synthLoan.timeClosed* is always equal to zero (see *require* statement on line [305]). Therefore, the if statement on line [357] is redundant and unnecessary.
+66. **Redundant and Unused Code**: The *\_recordLoanClosure()* function returns a boolean ( *loanClosed* ) which is never used by the calling function (see *\_closeLoan*() , line [312]). Furthermore, since the *\_recordLoanClosure*() function is only called via the *\_closeLoan*() function, this means that *synthLoan.timeClosed* is always equal to zero (see *require* statement on line [305]). Therefore, the if statement on line [357] is redundant and unnecessary.
 
-    1.  Recommendation: 1) Using the return value of the *_recordLoanClosure*() function or changing the function definition to stop returning *loanClosed* 2) Removing the if statement in line [357]
+    1.  Recommendation: 1) Using the return value of the *\_recordLoanClosure*() function or changing the function definition to stop returning *loanClosed* 2) Removing the if statement in line [357]
 
     2.  [Sigma Prime's Audit of Synthetix EtherCollateral](https://github.com/sigp/public-audits/blob/master/synthetix/ethercollateral/review.pdf)
 
@@ -1240,7 +1243,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [Sigma Prime's Audit of Synthetix EtherCollateral](https://github.com/sigp/public-audits/blob/master/synthetix/ethercollateral/review.pdf)
 
-70. **Possible Unintended Token Burning in *****transferFrom*****() Function**: *InfiniGold* allows users to convert/exchange their PMGT tokens to "gold certificates", which are digital artefacts effectively redeemable for actual gold. To do so, users are supposed to send their PMGT tokens to a specific burn address. The *transferFrom*() function does not check the to address against this burn address. Users may send tokens to the burn address, using the *transferFrom*() function, without triggering the emission of the *Burn(address indexed burner, uint256 value)* event, which dictates how the gold certificates are created and distributed.
+70. **Possible Unintended Token Burning in \*\*\***transferFrom**\***() Function\**: *InfiniGold* allows users to convert/exchange their PMGT tokens to "gold certificates", which are digital artefacts effectively redeemable for actual gold. To do so, users are supposed to send their PMGT tokens to a specific burn address. The *transferFrom*() function does not check the to address against this burn address. Users may send tokens to the burn address, using the *transferFrom*() function, without triggering the emission of the *Burn(address indexed burner, uint256 value)\* event, which dictates how the gold certificates are created and distributed.
 
     1.  Recommendation: Prevent sending tokens to the burn address in the *transferFrom*() function. This can be achieved by adding a *require* within *transferFrom*() which disallows the to address to be the *burnAddress* .
 
@@ -1258,7 +1261,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [Sigma Prime's Audit of InfiniGold](https://github.com/sigp/public-audits/raw/master/infinigold/review.pdf)
 
-73. **Unnecessary *****require***** Statement**: The following *require* statement in *Blacklistable.sol *can be removed: *require(to != address(0));* Indeed, this check is implemented in the *_transfer*() function in the *ERC20.sol* smart contract.
+73. **Unnecessary \*\*\***require**\*** Statement\**: The following *require* statement in *Blacklistable.sol *can be removed: *require(to != address(0));_ Indeed, this check is implemented in the _\_transfer*() function in the *ERC20.sol\* smart contract.
 
     1.  Recommendation: Consider removing the require statement for gas saving purposes.
 
@@ -1300,7 +1303,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of HoldeFi](https://blog.openzeppelin.com/holdefi-audit)
 
-80. **Named return variables**: There is an inconsistent use of named return variables across the entire codebase. 
+80. **Named return variables**: There is an inconsistent use of named return variables across the entire codebase.
 
     1.  Recommendation: Consider removing all named return variables, explicitly declaring them as local variables in the body of the function, and adding the necessary explicit return statements where appropriate. This should favor both explicitness and readability of the project.
 
@@ -1312,31 +1315,31 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of HoldeFi](https://blog.openzeppelin.com/holdefi-audit)
 
-82. **Assignment in *****require***** statement**: In the *YieldOracle* contract, there is a *require* statement that makes an assignment. This deviates from the standard usage and intention of *require* statements and can easily lead to confusion.
+82. **Assignment in \*\*\***require**\*** statement\**: In the *YieldOracle* contract, there is a *require* statement that makes an assignment. This deviates from the standard usage and intention of *require\* statements and can easily lead to confusion.
 
     1.  Recommendation: Consider moving the assignment to its own line before the *require* statement and then using the *require* statement solely for condition checking.
 
     2.  [OpenZeppelin's Audit of BarnBrige Smart Yield Bonds](https://blog.openzeppelin.com/barnbridge-smart-yield-bonds-audit/)
 
-83. **Commented code**: Throughout the codebase there are lines of code that have been commented out with //. This can lead to confusion and is detrimental to overall code readability. 
+83. **Commented code**: Throughout the codebase there are lines of code that have been commented out with //. This can lead to confusion and is detrimental to overall code readability.
 
     1.  Recommendation: Consider removing commented out lines of code that are no longer needed.
 
     2.  [OpenZeppelin's Audit of BarnBrige Smart Yield Bonds](https://blog.openzeppelin.com/barnbridge-smart-yield-bonds-audit/)
 
-84. **Misleading *****revert***** messages**: Error messages are intended to notify users about failing conditions, and should provide enough information so that the appropriate corrections needed to interact with the system can be applied. Uninformative error messages greatly damage the overall user experience, thus lowering the system's quality. 
+84. **Misleading \*\*\***revert**\*** messages\*\*: Error messages are intended to notify users about failing conditions, and should provide enough information so that the appropriate corrections needed to interact with the system can be applied. Uninformative error messages greatly damage the overall user experience, thus lowering the system's quality.
 
     1.  Recommendation: Consider not only fixing the specific issues mentioned, but also reviewing the entire codebase to make sure every error message is informative and user-friendly enough. Furthermore, for consistency, consider reusing error messages when extremely similar conditions are checked.
 
     2.  [OpenZeppelin's Audit of Compound Governor Bravo](https://blog.openzeppelin.com/compound-governor-bravo-audit/)
 
-85. **Multiple outdated Solidity versions in use**: Outdated versions of Solidity are being used in all contracts. The compiler options in the truffle-config file specifies version 0.6.6, which was released on April 6, 2020. Throughout the codebase there are also different versions of Solidity being used. 
+85. **Multiple outdated Solidity versions in use**: Outdated versions of Solidity are being used in all contracts. The compiler options in the truffle-config file specifies version 0.6.6, which was released on April 6, 2020. Throughout the codebase there are also different versions of Solidity being used.
 
     1.  Recommendation: As Solidity is now under a fast release cycle, consider using a more recent version of the compiler, such as version 0.7.6. In addition, to avoid unexpected behavior, consider specifying explicit Solidity versions in pragma statements.
 
     2.  [OpenZeppelin's Audit of Fei Protocol](https://blog.openzeppelin.com/fei-protocol-audit/)
 
-86. **Test and production constants in the same codebase**: The *CoreOrchestrator* contract defines the *TEST_MODE* boolean variable which is used to define several constants in the system. This decreases legibility of production code, and makes the system's integral values more error-prone. 
+86. **Test and production constants in the same codebase**: The *CoreOrchestrator* contract defines the *TEST_MODE* boolean variable which is used to define several constants in the system. This decreases legibility of production code, and makes the system's integral values more error-prone.
 
     1.  Recommendation: Consider having different environments for production and testing, with different contracts.
 
@@ -1348,13 +1351,13 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of Fei Protocol](https://blog.openzeppelin.com/fei-protocol-audit/)
 
-88. **Use of *****uint***** instead of *****uint256***: Across the codebase, there are hundreds of instances of *uint*, as opposed to *uint256*.
+88. **Use of \*\*\***uint**\*** instead of **\***uint256*\*\*: Across the codebase, there are hundreds of instances of *uint*, as opposed to *uint256\*.
 
     1.  Recommendation: In favor of explicitness, consider replacing all instances of *uint* with *uint256*.
 
     2.  [OpenZeppelin's Audit of Fei Protocol](https://blog.openzeppelin.com/fei-protocol-audit/)
 
-89. **Functions with unexpected side-effects**: Some functions have side-effects. For example, the *_getLatestFundingRate* function of the *FundingRateApplier* contract might also update the funding rate and send rewards. The getPrice function of the *OptimisticOracle* contract might also settle a price request. These side-effect actions are not clear in the name of the functions and are thus unexpected, which could lead to mistakes when the code is modified by new developers not experienced in all the implementation details of the project.
+89. **Functions with unexpected side-effects**: Some functions have side-effects. For example, the *\_getLatestFundingRate* function of the *FundingRateApplier* contract might also update the funding rate and send rewards. The getPrice function of the *OptimisticOracle* contract might also settle a price request. These side-effect actions are not clear in the name of the functions and are thus unexpected, which could lead to mistakes when the code is modified by new developers not experienced in all the implementation details of the project.
 
     1.  Recommendation: Consider splitting these functions in separate getters and setters. Alternatively, consider renaming the functions to describe all the actions that they perform.
 
@@ -1366,7 +1369,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of GEB Protocol](https://blog.openzeppelin.com/geb-protocol-audit/)
 
-91. **Missing error messages in *****require***** statements**: There are many places where *require* statements are correctly followed by their error messages, clarifying what was the triggered exception. However, there are places where *require* statements are not followed by the corresponding error messages. If any of those *require* statements were to fail the checked condition, the transaction\
+91. **Missing error messages in \*\*\***require**\*** statements\**: There are many places where *require* statements are correctly followed by their error messages, clarifying what was the triggered exception. However, there are places where *require* statements are not followed by the corresponding error messages. If any of those *require\* statements were to fail the checked condition, the transaction\
     would revert silently without an informative error message.
 
     1.  Recommendation: Consider including specific and informative error messages in all *require* statements.
@@ -1379,7 +1382,7 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of GEB Protocol](https://blog.openzeppelin.com/geb-protocol-audit/)
 
-93. **Unnecessary *****require***** statements**: There are several instances in the code base where the *require* statements or conditional checks are unnecessary. For instance: In the *OracleRelayer* contract, the *require* statement in the *modifyParameters* function at line 189 checks if the input parameter data > 0. This is unnecessary since the same condition is already checked in the *require* statement at line 187.
+93. **Unnecessary \*\*\***require**\*** statements\**: There are several instances in the code base where the *require* statements or conditional checks are unnecessary. For instance: In the *OracleRelayer* contract, the *require* statement in the *modifyParameters* function at line 189 checks if the input parameter data > 0. This is unnecessary since the same condition is already checked in the *require\* statement at line 187.
 
     1.  Recommendation: To simplify the code and prevent wastage of gas, consider removing the unnecessary checks.
 
@@ -1391,13 +1394,13 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of GEB Protocol](https://blog.openzeppelin.com/geb-protocol-audit/)
 
-95. ***oToken***** can be created with a non-whitelisted collateral asset**: A product consists of a set of assets and an option type. Each product has to be whitelisted by the admin using the *whitelistProduct* function from the Whitelist contract.
+95. **\*oToken\*\*\*** can be created with a non-whitelisted collateral asset\**: A product consists of a set of assets and an option type. Each product has to be whitelisted by the admin using the *whitelistProduct\* function from the Whitelist contract.
 
     1.  Recommendation: Consider validating if the assets involved in a product have been already whitelisted before allowing the creation of *oTokens*.
 
     2.  [OpenZeppelin's Audit of Opyn Gamma Protocol](https://blog.openzeppelin.com/opyn-gamma-protocol-audit/)
 
-96. **Mismatches between contracts and interfaces**: Interfaces define the exposed functionality of the implemented contracts. However, in several interfaces there are functions from the counterpart contracts that are not defined. 
+96. **Mismatches between contracts and interfaces**: Interfaces define the exposed functionality of the implemented contracts. However, in several interfaces there are functions from the counterpart contracts that are not defined.
 
     1.  Recommendation: Consider applying the necessary changes in the mentioned interfaces and contracts so that definitions and implementations fully match.
 
@@ -1421,11 +1424,11 @@ _The numbering starts from 102 in the original article._
 
     2.  [OpenZeppelin's Audit of PoolTogether V3](https://blog.openzeppelin.com/pooltogether-v3-audit/)
 
-100. **Use *****delete***** to clear variables**: The Controller contract sets a variable to the zero address in order to clear it. Similarly, the *SetToken* clears the locker by assigning the zero address.
+100.  **Use \*\*\***delete**\*** to clear variables\**: The Controller contract sets a variable to the zero address in order to clear it. Similarly, the *SetToken\* clears the locker by assigning the zero address.
 
-    1.  Recommendation: The *delete* key better conveys the intention and is also more idiomatic. Consider replacing assignments of zero with *delete* statements.
+101.  Recommendation: The *delete* key better conveys the intention and is also more idiomatic. Consider replacing assignments of zero with *delete* statements.
 
-    2.  [OpenZeppelin's Audit of Set Protocol](https://blog.openzeppelin.com/set-protocol-audit/)
+102.  [OpenZeppelin's Audit of Set Protocol](https://blog.openzeppelin.com/set-protocol-audit/)
 
 ## Security Pitfalls & Best Practices 101
 
@@ -1437,9 +1440,9 @@ _The numbering starts from 102 in the original article._
 
 4.  **Incorrect access control**: Contract functions executing critical logic should have appropriate access control enforced via address checks (e.g. owner, controller etc.) typically in modifiers. Missing checks allow attackers to control critical logic. (see [here](https://docs.openzeppelin.com/contracts/3.x/api/access) and [here](https://dasp.co/#item-2))
 
-5.  **Unprotected withdraw function**: Unprotected (*external*/*public*) function calls sending Ether/tokens to user-controlled addresses may allow users to withdraw unauthorized funds. (see [here](https://swcregistry.io/docs/SWC-105))
+5.  **Unprotected withdraw function**: Unprotected (_external_/_public_) function calls sending Ether/tokens to user-controlled addresses may allow users to withdraw unauthorized funds. (see [here](https://swcregistry.io/docs/SWC-105))
 
-6.  **Unprotected call to *****selfdestruct***: A user/attacker can mistakenly/intentionally kill the contract. Protect access to such functions. (see [here](https://swcregistry.io/docs/SWC-106))
+6.  **Unprotected call to \*\*\***selfdestruct\*\*\*: A user/attacker can mistakenly/intentionally kill the contract. Protect access to such functions. (see [here](https://swcregistry.io/docs/SWC-106))
 
 7.  **Modifier side-effects: **Modifiers should only implement checks and not make state changes and external calls which violates the [checks-effects-interactions](https://solidity.readthedocs.io/en/develop/security-considerations.html#use-the-checks-effects-interactions-pattern) pattern. These side-effects may go unnoticed by developers/auditors because the modifier code is typically far from the function implementation. (see [here](https://consensys.net/blog/blockchain-development/solidity-best-practices-for-smart-contract-security/))
 
@@ -1451,19 +1454,19 @@ _The numbering starts from 102 in the original article._
 
 11. **Implicit constructor callValue check**: The creation code of a contract that does not define a constructor but has a base that does, did not revert for calls with non-zero callValue when such a constructor was not explicitly payable. This is due to a compiler bug introduced in *v0.4.5* and fixed in *v0.6.8*. Starting from Solidity 0.4.5 the creation code of contracts without explicit payable constructor is supposed to contain a callvalue check that results in contract creation reverting, if non-zero value is passed. However, this check was missing in case no explicit constructor was defined in a contract at all, but the contract has a base that does define a constructor. In these cases it is possible to send value in a contract creation transaction or using inline assembly without revert, even though the creation code is supposed to be non-payable. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
-12. **Controlled delegatecall: ***delegatecall()* or *callcode()* to an address controlled by the user allows execution of malicious contracts in the context of the caller's state. Ensure trusted destination addresses for such calls. (see [here](https://swcregistry.io/docs/SWC-112))
+12. **Controlled delegatecall: \***delegatecall()* or *callcode()\* to an address controlled by the user allows execution of malicious contracts in the context of the caller's state. Ensure trusted destination addresses for such calls. (see [here](https://swcregistry.io/docs/SWC-112))
 
 13. **Reentrancy vulnerabilities**: Untrusted external contract calls could callback leading to unexpected results such as multiple withdrawals or out-of-order events. Use check-effects-interactions pattern or reentrancy guards. (see [here](https://swcregistry.io/docs/SWC-107))
 
 14. **ERC777 callbacks and reentrancy: **ERC777 tokens allow arbitrary callbacks via hooks that are called during token transfers. Malicious contract addresses may cause reentrancy on such callbacks if reentrancy guards are not used. (see [here](https://quantstamp.com/blog/how-the-dforce-hacker-used-reentrancy-to-steal-25-million))
 
-15. **Avoid *****transfer()*****/*****send() *****as reentrancy mitigations**: Although *transfer()* and *send()* have been recommended as a security best-practice to prevent reentrancy attacks because they only forward 2300 gas, the gas repricing of opcodes may break deployed contracts. Use *call()* instead, without hardcoded gas limits along with checks-effects-interactions pattern or reentrancy guards for reentrancy protection. (see [here](https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/) and [here](https://swcregistry.io/docs/SWC-134))
+15. **Avoid \*\*\***transfer()**\***/**\***send() **\***as reentrancy mitigations\**: Although *transfer()* and *send()* have been recommended as a security best-practice to prevent reentrancy attacks because they only forward 2300 gas, the gas repricing of opcodes may break deployed contracts. Use *call()\* instead, without hardcoded gas limits along with checks-effects-interactions pattern or reentrancy guards for reentrancy protection. (see [here](https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/) and [here](https://swcregistry.io/docs/SWC-134))
 
 16. **Private on-chain data**: Marking variables *private* does not mean that they cannot be read on-chain. Private data should not be stored unencrypted in contract code or state but instead stored encrypted or off-chain. (see [here](https://swcregistry.io/docs/SWC-136))
 
 17. **Weak PRNG**: PRNG relying on *block.timestamp*, *now* or *blockhash *can be influenced by miners to some extent and should be avoided. (see [here](https://swcregistry.io/docs/SWC-120))
 
-18. **Block values as time proxies: ***block.timestamp* and *block.number *are not good proxies (i.e. representations, not to be confused with smart contract proxy/implementation pattern) for time because of issues with synchronization, miner manipulation and changing block times. (see [here](https://swcregistry.io/docs/SWC-116))
+18. **Block values as time proxies: \***block.timestamp* and *block.number \*are not good proxies (i.e. representations, not to be confused with smart contract proxy/implementation pattern) for time because of issues with synchronization, miner manipulation and changing block times. (see [here](https://swcregistry.io/docs/SWC-116))
 
 19. **Integer overflow/underflow**: Not using OpenZeppelin's SafeMath (or similar libraries) that check for overflows/underflows may lead to vulnerabilities or unexpected behavior if user/attacker can control the integer operands of such arithmetic operations. *Solc v0.8.0* introduced default overflow/underflow checks for all arithmetic operations. (see [here](https://swcregistry.io/docs/SWC-101) and [here](https://blog.soliditylang.org/2020/10/28/solidity-0.8.x-preview/))
 
@@ -1471,39 +1474,39 @@ _The numbering starts from 102 in the original article._
 
 21. **Transaction order dependence: **Race conditions can be forced on specific Ethereum transactions by monitoring the mempool. For example, the classic ERC20 *approve()* change can be front-run using this method. Do not make assumptions about transaction order dependence. (see [here](https://swcregistry.io/docs/SWC-114))
 
-22. **ERC20 *****approve()***** race condition: **Use *safeIncreaseAllowance()* and *safeDecreaseAllowance()* from OpenZeppelin's *SafeERC20* implementation to prevent race conditions from manipulating the allowance amounts. (see [here](https://swcregistry.io/docs/SWC-114))
+22. **ERC20 \*\*\***approve()**\*** race condition: \**Use *safeIncreaseAllowance()* and *safeDecreaseAllowance()* from OpenZeppelin's *SafeERC20\* implementation to prevent race conditions from manipulating the allowance amounts. (see [here](https://swcregistry.io/docs/SWC-114))
 
 23. **Signature malleability**: The *ecrecover* function is susceptible to signature malleability which could lead to replay attacks. Consider using OpenZeppelin's[ ECDSA library](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/ECDSA.sol). (see [here](https://swcregistry.io/docs/SWC-117), [here](https://swcregistry.io/docs/SWC-121) and [here](https://medium.com/cryptronics/signature-replay-vulnerabilities-in-smart-contracts-3b6f7596df57))
 
 24. **ERC20 transfer() does not return boolean: **Contracts compiled with *solc >= 0.4.22* interacting with such functions will revert. Use OpenZeppelin's SafeERC20 wrappers. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface) and [here](https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca))
 
-25. **Incorrect return values for ERC721 *****ownerOf()*****: **Contracts compiled with *solc >= 0.4.22* interacting with ERC721 *ownerOf()* that returns a *bool* instead of *address* type will revert. Use OpenZeppelin's ERC721 contracts. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc721-interface))
+25. **Incorrect return values for ERC721 \*\*\***ownerOf()**\***: \**Contracts compiled with *solc >= 0.4.22* interacting with ERC721 *ownerOf()* that returns a *bool* instead of *address\* type will revert. Use OpenZeppelin's ERC721 contracts. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc721-interface))
 
 26. **Unexpected Ether and this.balance**: A contract can receive Ether via *payable* functions, *selfdestruct(), coinbase *transaction or pre-sent before creation. Contract logic depending on *this.balanc*e can therefore be manipulated. (see [here](https://github.com/sigp/solidity-security-blog#3-unexpected-ether-1) and [here](https://swcregistry.io/docs/SWC-132))
 
-27. ***fallback***** vs *****receive()***: Check that all precautions and subtleties of *fallback*/*receive* functions related to visibility, state mutability and Ether transfers have been considered.  (see [here](https://docs.soliditylang.org/en/latest/contracts.html#fallback-function) and [here](https://docs.soliditylang.org/en/latest/contracts.html#receive-ether-function))
+27. **\*fallback\*\*\*** vs **\***receive()*\*\*: Check that all precautions and subtleties of *fallback*/*receive\* functions related to visibility, state mutability and Ether transfers have been considered.  (see [here](https://docs.soliditylang.org/en/latest/contracts.html#fallback-function) and [here](https://docs.soliditylang.org/en/latest/contracts.html#receive-ether-function))
 
 28. **Dangerous strict equalities: **Use of strict equalities with tokens/Ether can accidentally/maliciously cause unexpected behavior. Consider using *>=* or *<=* instead of *==* for such variables depending on the contract logic. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities))
 
 29. **Locked Ether**: Contracts that accept Ether via *payable* functions but without withdrawal mechanisms will lock up that Ether. Remove *payable* attribute or add withdraw function. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether))
 
-30. **Dangerous usage of *****tx.origin***: Use of *tx.origin* for authorization may be abused by a MITM malicious contract forwarding calls from the legitimate user who interacts with it. Use *msg.sender* instead. (see [here](https://swcregistry.io/docs/SWC-115))
+30. **Dangerous usage of \*\*\***tx.origin*\*\*: Use of *tx.origin* for authorization may be abused by a MITM malicious contract forwarding calls from the legitimate user who interacts with it. Use *msg.sender\* instead. (see [here](https://swcregistry.io/docs/SWC-115))
 
 31. **Contract check: **Checking if a call was made from an Externally Owned Account (EOA) or a contract account is typically done using *extcodesize* check which may be circumvented by a contract during construction when it does not have source code available. Checking if *tx.origin == msg.sender *is another option. Both have implications that need to be considered. (see [here](https://consensys.net/blog/blockchain-development/solidity-best-practices-for-smart-contract-security/))
 
-32. **Deleting a *****mapping***** within a *****struct***: Deleting a *struct* that contains a *mapping* will not delete the *mapping* contents which may lead to unintended consequences. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#deletion-on-mapping-containing-a-structure))
+32. **Deleting a \*\*\***mapping**\*** within a **\***struct*\*\*: Deleting a *struct* that contains a *mapping* will not delete the *mapping\* contents which may lead to unintended consequences. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#deletion-on-mapping-containing-a-structure))
 
 33. **Tautology or contradiction: **Tautologies (always true) or contradictions (always false) indicate potential flawed logic or redundant checks. e.g. *x >= 0* which is always true if *x* is *uint*. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#tautology-or-contradiction))
 
-34. **Boolean constant**: Use of Boolean constants (*true*/*false*) in code (e.g. conditionals) is indicative of flawed logic. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#misuse-of-a-boolean-constant))
+34. **Boolean constant**: Use of Boolean constants (_true_/_false_) in code (e.g. conditionals) is indicative of flawed logic. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#misuse-of-a-boolean-constant))
 
-35. **Boolean equality**: Boolean variables can be checked within conditionals directly without the use of equality operators to *true*/*false*. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality))
+35. **Boolean equality**: Boolean variables can be checked within conditionals directly without the use of equality operators to *true*/_false_. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality))
 
-36. **State-modifying functions**: Functions that modify state (in assembly or otherwise) but are labelled *constant*/*pure*/*view* revert in *solc >=0.5.0* (work in prior versions) because of the use of *STATICCALL* opcode. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#constant-functions-using-assembly-code))
+36. **State-modifying functions**: Functions that modify state (in assembly or otherwise) but are labelled *constant*/_pure_/*view* revert in *solc >=0.5.0* (work in prior versions) because of the use of *STATICCALL* opcode. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#constant-functions-using-assembly-code))
 
-37. **Return values of low-level calls**: Ensure that return values of low-level calls (*call*/*callcode*/*delegatecall*/*send*/etc.) are checked to avoid unexpected failures. (see [here](https://swcregistry.io/docs/SWC-104))
+37. **Return values of low-level calls**: Ensure that return values of low-level calls (_call_/_callcode_/_delegatecall_/_send_/etc.) are checked to avoid unexpected failures. (see [here](https://swcregistry.io/docs/SWC-104))
 
-38. **Account existence check for low-level calls**: Low-level calls *call*/*delegatecall*/*staticcall* return true even if the account called is non-existent (per EVM design). Account existence must be checked prior to calling if needed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls))
+38. **Account existence check for low-level calls**: Low-level calls *call*/_delegatecall_/*staticcall* return true even if the account called is non-existent (per EVM design). Account existence must be checked prior to calling if needed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls))
 
 39. **Dangerous shadowing: **Local variables, state variables, functions, modifiers, or events with names that shadow (i.e. override) builtin Solidity symbols e.g. *now *or other declarations from the current scope are misleading and may lead to unexpected usages and behavior. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#builtin-symbol-shadowing))
 
@@ -1531,11 +1534,11 @@ _The numbering starts from 102 in the original article._
 
 51. **assert()/require() state change**: Invariants in *assert()* and *require()* statements should not modify the state per best practices. (see [here](https://swcregistry.io/docs/SWC-110))
 
-52. ***require()***** vs *****assert()*****: ***require()* should be used for checking error conditions on inputs and return values while *assert()* should be used for invariant checking. Between *solc 0.4.10 *and *0.8.0*, *require()* used *REVERT* (*0xfd*) opcode which refunded remaining gas on failure while *assert()* used INVALID (*0xfe*) opcode which consumed all the supplied gas. (see [here](https://docs.soliditylang.org/en/v0.8.1/control-structures.html#error-handling-assert-require-revert-and-exceptions))
+52. **\*require()\*\*\*** vs **\***assert()**\***: *\*\*require()* should be used for checking error conditions on inputs and return values while *assert()* should be used for invariant checking. Between *solc 0.4.10 *and *0.8.0*, *require()* used *REVERT* (_0xfd_) opcode which refunded remaining gas on failure while *assert()* used INVALID (_0xfe_) opcode which consumed all the supplied gas. (see [here](https://docs.soliditylang.org/en/v0.8.1/control-structures.html#error-handling-assert-require-revert-and-exceptions))
 
 53. **Deprecated keywords**: Use of deprecated functions/operators such as *block.blockhash()* for *blockhash()*, *msg.gas* for *gasleft(), throw* for *revert()*, *sha3()* for *keccak256()*, *callcode()* for *delegatecall(),* *suicide()* for *selfdestruct(), constant *for* view *or* var *for* actual type name* should be avoided to prevent unintended errors with newer compiler versions. (see [here](https://swcregistry.io/docs/SWC-111))
 
-54. **Function default visibility***: *Functions without a visibility type specifier are *public* by default in *solc < 0.5.0*. This can lead to a vulnerability where a malicious user may make unauthorized state changes. *solc >= 0.5.0* requires explicit function visibility specifiers. (see [here](https://swcregistry.io/docs/SWC-100))
+54. **Function default visibility\***: *Functions without a visibility type specifier are *public* by default in *solc < 0.5.0*. This can lead to a vulnerability where a malicious user may make unauthorized state changes. *solc >= 0.5.0\* requires explicit function visibility specifiers. (see [here](https://swcregistry.io/docs/SWC-100))
 
 55. **Incorrect inheritance order**: Contracts inheriting from multiple contracts with identical functions should specify the correct inheritance order i.e. more general to more specific to avoid inheriting the incorrect function implementation. (see [here](https://swcregistry.io/docs/SWC-125))
 
@@ -1551,7 +1554,7 @@ _The numbering starts from 102 in the original article._
 
 61. **Malleability risk from dirty high order bits**: Types that do not occupy the full 32 bytes might contain "dirty higher order bits" which does not affect operation on types but gives different results with *msg.data*. (see [here](https://docs.soliditylang.org/en/v0.8.1/security-considerations.html#minor-details))
 
-62. **Incorrect shift in assembly**: Shift operators (*shl(x, y)*, *shr(x, y)*, *sar(x, y)*) in Solidity assembly apply the shift operation of *x* bits on *y *and not the other way around, which may be confusing. Check if the values in a shift operation are reversed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly))
+62. **Incorrect shift in assembly**: Shift operators (_shl(x, y)_, *shr(x, y)*, *sar(x, y)*) in Solidity assembly apply the shift operation of *x* bits on *y *and not the other way around, which may be confusing. Check if the values in a shift operation are reversed. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly))
 
 63. **Assembly usage**: Use of EVM assembly is error-prone and should be avoided or double-checked for correctness. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage))
 
@@ -1569,7 +1572,7 @@ _The numbering starts from 102 in the original article._
 
 70. **Long number literals**: Number literals with many digits should be carefully checked as they are prone to error. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits))
 
-71. **Out-of-range enum: ***Solc < 0.4.5 *produced unexpected behavior with out-of-range enums*. *Check enum conversion or use a newer compiler.(see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-enum-conversion))
+71. **Out-of-range enum: \***Solc < 0.4.5 *produced unexpected behavior with out-of-range enums*. \*Check enum conversion or use a newer compiler.(see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-enum-conversion))
 
 72. **Uncalled public functions**: *Public* functions that are never called from within the contracts should be declared *external* to save gas. (see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external))
 
@@ -1581,7 +1584,7 @@ _The numbering starts from 102 in the original article._
 
 76. **Redundant statements**: Statements with no effects that do not produce code may be indicative of programmer error or missing logic, which needs to be flagged for removal or addressed appropriately. (see [here](https://swcregistry.io/docs/SWC-135))
 
-77. **Storage array with signed Integers with ABIEncoderV2**: Assigning an array of signed integers to a storage array of different type can lead to data corruption in that array. This is due to a compiler bug introduced in *v0.4.7* and fixed in *v0.5.10*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html)) 
+77. **Storage array with signed Integers with ABIEncoderV2**: Assigning an array of signed integers to a storage array of different type can lead to data corruption in that array. This is due to a compiler bug introduced in *v0.4.7* and fixed in *v0.5.10*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
 78. **Dynamic constructor arguments clipped with ABIEncoderV2**: A contract's constructor which takes structs or arrays that contain dynamically sized arrays reverts or decodes to invalid data when ABIEncoderV2 is used. This is due to a compiler bug introduced in *v0.4.16* and fixed in *v0.5.9*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
@@ -1597,11 +1600,11 @@ _The numbering starts from 102 in the original article._
 
 84. **Missing escaping in formatting with ABIEncoderV2: **String literals containing double backslash characters passed directly to external or encoding function calls can lead to a different string being used when ABIEncoderV2 is enabled. This is due to a compiler bug introduced in *v0.5.14* and fixed in *v0.6.8*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
-85. **Double shift size overflow**: Double bitwise shifts by large constants whose sum overflows 256 bits can result in unexpected values. Nested logical shift operations whose total shift size is *2**256* or more are incorrectly optimized. This only applies to shifts by numbers of bits that are compile-time constant expressions. This happens when the optimizer is used and *evmVersion >= Constantinople. *This is due to a compiler bug introduced in *v0.5.5* and fixed in *v0.5.6*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
+85. **Double shift size overflow**: Double bitwise shifts by large constants whose sum overflows 256 bits can result in unexpected values. Nested logical shift operations whose total shift size is *2\*\*256* or more are incorrectly optimized. This only applies to shifts by numbers of bits that are compile-time constant expressions. This happens when the optimizer is used and *evmVersion >= Constantinople. *This is due to a compiler bug introduced in *v0.5.5* and fixed in *v0.5.6*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
 86. **Incorrect byte instruction optimization: **The optimizer incorrectly handles byte opcodes whose second argument is 31 or a constant expression that evaluates to 31. This can result in unexpected values. This can happen when performing index access on *bytesNN* types with a compile time constant value (not index) of 31 or when using the byte opcode in inline assembly. This is due to a compiler bug introduced in *v0.5.5* and fixed in *v0.5.7*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
-87. **Essential assignments removed with Yul Optimizer** : The Yul optimizer can remove essential assignments to variables declared inside *for* loops when Yul's *continue* or *break* statement is used mostly while using inline assembly with *for* loops and *continue* and *break* statements. This is due to a compiler bug introduced in *v0.5.8*/*v0.6.0* and fixed in *v0.5.16*/*v0.6.1*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
+87. **Essential assignments removed with Yul Optimizer** : The Yul optimizer can remove essential assignments to variables declared inside *for* loops when Yul's *continue* or *break* statement is used mostly while using inline assembly with *for* loops and *continue* and *break* statements. This is due to a compiler bug introduced in *v0.5.8*/*v0.6.0* and fixed in *v0.5.16*/_v0.6.1_. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
 88. **Private methods overridden**: While private methods of base contracts are not visible and cannot be called directly from the derived contract, it is still possible to declare a function of the same name and type and thus change the behaviour of the base contract's function. This is due to a compiler bug introduced in *v0.3.0* and fixed in *v0.5.17*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
@@ -1613,7 +1616,7 @@ _The numbering starts from 102 in the original article._
 
 92. **Memory array creation overflow**: The creation of very large memory arrays can result in overlapping memory regions and thus memory corruption. This is due to a compiler bug introduced in *v0.2.0* and fixed in *v0.6.5*. (see [here](https://solidity.ethereum.org/2020/04/06/memory-creation-overflow-bug/))
 
-93. **Calldata** ***using for***: Function calls to internal library functions with calldata parameters called via "*using for"* can result in invalid data being read. This is due to a compiler bug introduced in *v0.6.9* and fixed in *v0.6.10*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
+93. **Calldata** **_using for_**: Function calls to internal library functions with calldata parameters called via "*using for"* can result in invalid data being read. This is due to a compiler bug introduced in *v0.6.9* and fixed in *v0.6.10*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
 94. **Free function redefinition**: The compiler does not flag an error when two or more free functions (functions outside of a contract) with the same name and parameter types are defined in a source unit or when an imported free function alias shadows another free function with a different name but identical parameter types. This is due to a compiler bug introduced in *v0.7.1* and fixed in *v0.7.2*. (see [here](https://docs.soliditylang.org/en/v0.8.9/bugs.html))
 
@@ -1623,15 +1626,16 @@ _The numbering starts from 102 in the original article._
 
 97. **Import upgradeable contracts in proxy-based upgradeable contracts**: Contracts imported from proxy-based upgradeable contracts should also be upgradeable where such contracts have been modified to use initializers instead of constructors. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#use-upgradeable-libraries))
 
-98. **Avoid *****selfdestruct***** or *****delegatecall***** in proxy-based upgradeable contracts**: This will cause the logic contract to be destroyed and all contract instances will end up delegating calls to an address without any code. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations))
+98. **Avoid \*\*\***selfdestruct**\*** or **\***delegatecall**\*** in proxy-based upgradeable contracts\*\*: This will cause the logic contract to be destroyed and all contract instances will end up delegating calls to an address without any code. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations))
 
 99. **State variables in proxy-based upgradeable contracts**: The declaration order/layout and type/mutability of state variables in such contracts should be preserved exactly while upgrading to prevent critical storage layout mismatch errors. (see [here](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts))
 
-100. **Function ID collision between proxy/implementation in proxy-based upgradeable contracts**: Malicious proxy contracts may exploit function ID collision to invoke unintended proxy functions instead of delegating to implementation functions. Check for function ID collisions. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-ids-collisions) and [here](https://forum.openzeppelin.com/t/beware-of-the-proxy-learn-how-to-exploit-function-clashing/1070))
+100.  **Function ID collision between proxy/implementation in proxy-based upgradeable contracts**: Malicious proxy contracts may exploit function ID collision to invoke unintended proxy functions instead of delegating to implementation functions. Check for function ID collisions. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-ids-collisions) and [here](https://forum.openzeppelin.com/t/beware-of-the-proxy-learn-how-to-exploit-function-clashing/1070))
 
-101. **Function shadowing between proxy/contract in proxy-based upgradeable contracts**: Shadow functions in proxy contract prevent functions in logic contract from being invoked. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-shadowing))
+101.  **Function shadowing between proxy/contract in proxy-based upgradeable contracts**: Shadow functions in proxy contract prevent functions in logic contract from being invoked. (see [here](https://github.com/crytic/slither/wiki/Upgradeability-Checks#functions-shadowing))
 
 ## Security Pitfalls & Best Practices 201
+
 _The numbering starts from 102 in the original article._
 
 1.  **ERC20 transfer and transferFrom**: Should return a boolean. Several tokens do not return a boolean on these functions. As a result, their calls in the contract might fail. (See [here](https://github.com/crytic/building-secure-contracts/blob/master/development-guidelines/token_integration.md#erc-conformity))
@@ -1640,7 +1644,7 @@ _The numbering starts from 102 in the original article._
 
 3.  **ERC20 decimals returns a uint8**: Several tokens incorrectly return a uint256. If this is the case, ensure the value returned is below 255. (See [here](https://github.com/crytic/building-secure-contracts/blob/master/development-guidelines/token_integration.md#erc-conformity))
 
-4.  **ERC20 *****approve***** race-condition**: The ERC20 standard has a known ERC20 race condition that must be mitigated to prevent attackers from stealing tokens. (See [here](https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729))
+4.  **ERC20 \*\*\***approve**\*** race-condition\*\*: The ERC20 standard has a known ERC20 race condition that must be mitigated to prevent attackers from stealing tokens. (See [here](https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729))
 
 5.  **ERC777 hooks**: ERC777 tokens have the concept of a hook function that is called before any calls to send, transfer, operatorSend, minting and burning. While these hooks enable a lot of interesting use cases, care should be taken to make sure they do not make external calls because that can lead to reentrancies. (See [here](https://github.com/crytic/building-secure-contracts/blob/master/development-guidelines/token_integration.md#erc-conformity))
 
@@ -1716,13 +1720,13 @@ _The numbering starts from 102 in the original article._
 
 41. **Function return values**: Ensure that the appropriate return value(s) are returned from functions and checked without ignoring at function call sites, so that error conditions are caught and handled appropriately.
 
-42. **Function invocation timeliness**: Externally accessible functions (*external*/*public* visibility) may be called at any time (or never). It is not safe to assume they will only be called at specific system phases (e.g. after initialization, when unpaused, during liquidation) that is meaningful to the system design. The reason for this can be accidental or malicious. Function implementation should be robust enough to track system state transitions, determine meaningful states for invocations and withstand arbitrary calls. For e.g., initialization functions (used with upgradeable contracts that cannot use constructors) are meant to be called atomically along with contract deployment to prevent anyone else from initializing with arbitrary values.
+42. **Function invocation timeliness**: Externally accessible functions (_external_/*public* visibility) may be called at any time (or never). It is not safe to assume they will only be called at specific system phases (e.g. after initialization, when unpaused, during liquidation) that is meaningful to the system design. The reason for this can be accidental or malicious. Function implementation should be robust enough to track system state transitions, determine meaningful states for invocations and withstand arbitrary calls. For e.g., initialization functions (used with upgradeable contracts that cannot use constructors) are meant to be called atomically along with contract deployment to prevent anyone else from initializing with arbitrary values.
 
-43. **Function invocation repetitiveness**: Externally accessible functions (*external*/*public* visibility) may be called any number of times. It is not safe to assume they will only be called only once or a specific number of times that is meaningful to the system design. Function implementation should be robust enough to track, prevent, ignore or account for arbitrarily repetitive invocations. For e.g., initialization functions (used with upgradeable contracts that cannot use constructors) are meant to be called only once.
+43. **Function invocation repetitiveness**: Externally accessible functions (_external_/*public* visibility) may be called any number of times. It is not safe to assume they will only be called only once or a specific number of times that is meaningful to the system design. Function implementation should be robust enough to track, prevent, ignore or account for arbitrarily repetitive invocations. For e.g., initialization functions (used with upgradeable contracts that cannot use constructors) are meant to be called only once.
 
-44. **Function invocation order:  **Externally accessible functions (*external*/*public* visibility) may be called in any order (with respect to other defined functions). It is not safe to assume they will only be called in the specific order that makes sense to the system design or is implicitly assumed in the code. For e.g., initialization functions (used with upgradeable contracts that cannot use constructors) are meant to be called before other system functions can be called.
+44. **Function invocation order:  **Externally accessible functions (_external_/*public* visibility) may be called in any order (with respect to other defined functions). It is not safe to assume they will only be called in the specific order that makes sense to the system design or is implicitly assumed in the code. For e.g., initialization functions (used with upgradeable contracts that cannot use constructors) are meant to be called before other system functions can be called.
 
-45. **Function invocation arguments**: Externally accessible functions (*external*/*public* visibility) may be called with any possible arguments. Without complete and proper validation (e.g. zero address checks, bound checks, threshold checks etc.), they cannot be assumed to comply with any assumptions made about them in the code.
+45. **Function invocation arguments**: Externally accessible functions (_external_/*public* visibility) may be called with any possible arguments. Without complete and proper validation (e.g. zero address checks, bound checks, threshold checks etc.), they cannot be assumed to comply with any assumptions made about them in the code.
 
 46. **Conditionals**: Ensure that in conditional expressions (e.g. if statements), the correct variables are being checked and the correct operators, if any, are being used to combine them. For e.g. using || instead of && is a common error.
 
@@ -1810,7 +1814,7 @@ _The numbering starts from 102 in the original article._
 
 88. **Privacy issues**: Data and transactions on the Ethereum blockchain are not private. Anyone can observe contract state and track transactions (both included in a block and pending in the mempool). Incorrect assumptions about privacy aspects of data or transactions can be abused which may lead to security issues.
 
-89. **Cloning issues**: Copy-pasting code from other libraries, contracts or even different parts of the same contract may result in incorrect code semantics for the context being copied to, copy over any vulnerabilities or miss any security fixes applied to the original code. All these may lead to security issues. 
+89. **Cloning issues**: Copy-pasting code from other libraries, contracts or even different parts of the same contract may result in incorrect code semantics for the context being copied to, copy over any vulnerabilities or miss any security fixes applied to the original code. All these may lead to security issues.
 
 90. **Business logic issues**: Incorrect or insufficient assumptions about the higher-order business logic being implemented in the application will lead to differences in expected and actual behavior, which may result in security issues.
 
@@ -1832,4 +1836,4 @@ _The numbering starts from 102 in the original article._
 
 99. **Principle of Work Factor**: "Compare the cost of circumventing the mechanism with the resources of a potential attacker" --- Given the magnitude of value managed by smart contracts, it is safe to assume that byzantine attackers will risk the greatest amounts of intellectual/financial/social capital possible to subvert such systems. Therefore, the mitigation mechanisms must factor in the highest levels of risk. (See [Saltzer and Schroeder's Secure Design Principles](https://en.wikipedia.org/wiki/Saltzer_and_Schroeder's_design_principles))
 
-100. **Principle of Compromise Recording**: "Mechanisms that reliably record that a compromise of information has occurred can be used in place of more elaborate mechanisms that completely prevent loss" --- Ensure that smart contracts and their accompanying operational infrastructure can be monitored/analyzed at all times (development/deployment/runtime) for minimizing loss from any compromise due to vulnerabilities/exploits. For e.g., critical operations in contracts should necessarily emit events to facilitate monitoring at runtime. (See [Saltzer and Schroeder's Secure Design Principles](https://en.wikipedia.org/wiki/Saltzer_and_Schroeder's_design_principles))
+100.  **Principle of Compromise Recording**: "Mechanisms that reliably record that a compromise of information has occurred can be used in place of more elaborate mechanisms that completely prevent loss" --- Ensure that smart contracts and their accompanying operational infrastructure can be monitored/analyzed at all times (development/deployment/runtime) for minimizing loss from any compromise due to vulnerabilities/exploits. For e.g., critical operations in contracts should necessarily emit events to facilitate monitoring at runtime. (See [Saltzer and Schroeder's Secure Design Principles](https://en.wikipedia.org/wiki/Saltzer_and_Schroeder's_design_principles))
